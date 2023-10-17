@@ -8,7 +8,7 @@ class TestPlan {
     [string[]] $IPs
     [string[]] $Tags
 
-    [string] $Code
+    [string] $Code = "200"
     [string] $Text
     [string] $Regex
     [bool] $InsecureSkipVerify = $false
@@ -18,12 +18,9 @@ class TestPlan {
         $cases = [System.Collections.Generic.List[TestCase]]::new()
 
         $case = [TestCase]@{
-            URL  = [uri]$this.URL
-            Plan = $this
-        }
-
-        if (![string]::IsNullOrEmpty($this.Code)) {
-            $case.ExpectCode = [System.Net.HttpStatusCode]$this.Code
+            URL        = [uri]$this.URL
+            Plan       = $this
+            ExpectCode = [System.Net.HttpStatusCode]$this.Code
         }
 
         if (![string]::IsNullOrEmpty($this.Text)) {
@@ -85,24 +82,25 @@ class TestCase {
 
             $response = $client.Send($content)
 
-            #$response = Invoke-WebRequest -Uri $this.URL.ToString() -SkipCertificateCheck:$this.Plan.InsecureSkipVerify -TimeoutSec $this.Plan.Timeout.TotalSeconds
-
             $result.Response = $response
 
             $result.Connected = $true
 
             if ($response.StatusCode -ne $this.ExpectCode) {
-                $result.Result = Write-Error -Message ("unexpected status code: {0}" -f $response.StatusCode)
+                $exception = [Exception]::new(("unexpected status code: {0}" -f $response.StatusCode))
+                $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "1", "InvalidResult", $response)
             }
             else {
                 $result.GotCode = $true
             }
 
-            if (!$response.Content.ReadAsStringAsync().GetAwaiter().GetResult().Contains($this.ExpectText)) {
-                $result.Result = Write-Error -Message ("response does not contain text {0}" -f $response.ExpectText)
-            }
-            else {
-                $result.GotText = $true
+            if (![string]::IsNullOrEmpty($this.ExpectText)) {
+                if (!$response.Content.ReadAsStringAsync().GetAwaiter().GetResult().Contains($this.ExpectText)) {
+                    $result.Result = Write-Error -Message ("response does not contain text {0}" -f $response.ExpectText)
+                }
+                else {
+                    $result.GotText = $true
+                }
             }
 
         }
@@ -132,4 +130,6 @@ class TestResult {
     [timespan] $TimeTotal
 }
 
-Add-Type -Path $PSScriptRoot/lib/netstandard2.0/Tomlyn.dll
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Tomlyn.dll"
+
+. "$PSScriptRoot/Invoke-HttpUnit.ps1"

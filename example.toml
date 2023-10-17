@@ -3,6 +3,15 @@
   url = "https://google.com"
   code = 200
 
+[[plan]]
+  label = "google"
+  url = "https://google.com"
+  code = "moved"
+
+[[plan]]
+  label = "google"
+  url = "https://www.google.com/"
+
 # Verify that this URL returns text that matches "some regex":
 [[plan]]
   label = "api"
