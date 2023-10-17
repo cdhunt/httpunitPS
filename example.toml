@@ -1,0 +1,19 @@
+[[plan]]
+  label = "google"
+  url = "https://google.com"
+  code = 200
+
+# Verify that this URL returns text that matches "some regex":
+[[plan]]
+  label = "api"
+  url = "http://api.example.com/"
+  text = "API for example.com"
+  regex = "some regex"
+
+# Verify that this URL returns a redirect. Send to both
+# the IP address listed in DNS, plus 10.11.22.33 and 10.99.88.77.
+[[plan]]
+  label = "redirect"
+  url = "https://example.com/redirect"
+  ips = ["*", "10.11.22.33", "10.99.88.77"]
+  code = 301
