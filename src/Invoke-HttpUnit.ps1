@@ -12,6 +12,10 @@ function Invoke-HttpUnit {
     For http/https, the expected status code, default 200.
 .PARAMETER String
     For http/https, a string we expect to find in the result.
+.PARAMETER Headers
+    For http/https, a hashtable to validate the response headers.
+.PARAMETER Certificate
+    For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate.
 .EXAMPLE
     PS > Invoke-HttpUnit -Url https://google.com -Code 200
 
