@@ -24,6 +24,7 @@ class TestPlan {
         }
 
         if (![string]::IsNullOrEmpty($this.Text)) {
+            Write-Debug ('Adding simple string matching test case. "{0}"' -f $this.Text)
             $case.ExpectText = $this.Text
         }
 
@@ -61,6 +62,8 @@ class TestCase {
         $result = [TestResult]::new()
         $time = Get-Date
 
+        Write-Debug ('TestHttp: Url={0} ExpectCode={1}' -f $this.URL.AbsoluteUri, $this.ExpectCode)
+
         if ($this._psVersion -le [version]"5.1") {
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12 -bor [System.Net.SecurityProtocolType]::Tls13
 
@@ -75,6 +78,7 @@ class TestCase {
         $content.RequestUri = $this.URL
 
         if ($this.Plan.InsecureSkipVerify) {
+            Write-Debug ('TestHttp: ValidateSSL={0}' -f $this.Plan.InsecureSkipVerify)
             $handler.ServerCertificateCustomValidationCallback = [Net.Http.HttpClientHandler]::DangerousAcceptAnyServerCertificateValidator
         }
 
@@ -83,11 +87,10 @@ class TestCase {
             $response = $client.Send($content)
 
             $result.Response = $response
-
             $result.Connected = $true
 
             if ($response.StatusCode -ne $this.ExpectCode) {
-                $exception = [Exception]::new(("unexpected status code: {0}" -f $response.StatusCode))
+                $exception = [Exception]::new(("Unexpected status code: {0}" -f $response.StatusCode))
                 $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "1", "InvalidResult", $response)
             }
             else {
@@ -95,8 +98,11 @@ class TestCase {
             }
 
             if (![string]::IsNullOrEmpty($this.ExpectText)) {
-                if (!$response.Content.ReadAsStringAsync().GetAwaiter().GetResult().Contains($this.ExpectText)) {
-                    $result.Result = Write-Error -Message ("response does not contain text {0}" -f $response.ExpectText)
+                $responseContent = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+                Write-Debug ('TestHttp: Response.Content.Length={0} ExpectText={0}' -f $responseContent.Length, $this.ExpectText)
+                if (!$responseContent.Contains($this.ExpectText)) {
+                    $exception = [Exception]::new(("Response does not contain text {0}" -f $response.ExpectText))
+                    $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "2", "InvalidResult", $response)
                 }
                 else {
                     $result.GotText = $true
@@ -105,7 +111,9 @@ class TestCase {
 
         }
         catch [Threading.Tasks.TaskCanceledException] {
-            $result.Result = Write-Error -Message ("request timed out after {0:N2}s" -f $this.Plan.Timeout.TotalSeconds)
+            $result.Result = Write-Error -Message
+            $exception = [Exception]::new(("Request timed out after {0:N2}s" -f $this.Plan.Timeout.TotalSeconds))
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "3", "OperationTimeout", $client)
         }
         catch {
             $result.Result = $_
