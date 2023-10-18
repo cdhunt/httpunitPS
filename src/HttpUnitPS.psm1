@@ -72,10 +72,8 @@ class TestCase {
 
         Write-Debug ('TestHttp: Url={0} ExpectCode={1}' -f $this.URL.AbsoluteUri, $this.ExpectCode)
 
-        if ($this._psVersion -le [version]"5.1") {
+        if ($this._psVersion -lt [version]"6.0") {
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12 -bor [System.Net.SecurityProtocolType]::Tls13
-
-            Add-Type -AssemblyName System.Net.Http
         }
 
         $handler = [Net.Http.HttpClientHandler]::new()
@@ -98,7 +96,7 @@ class TestCase {
 
         try {
 
-            $response = $client.Send($content)
+            $response = $client.SendAsync($content).GetAwaiter().GetResult()
 
             $result.Response = $response
             $result.Connected = $true
