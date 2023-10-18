@@ -12,7 +12,7 @@ class TestPlan {
     [string] $Text
     [string] $Regex
     [bool] $InsecureSkipVerify = $false
-    [timespan] $Timeout = [timespan]::new(0, 0, 30)
+    [timespan] $Timeout = [timespan]::new(0, 0, 3)
 
     [System.Collections.Generic.List[TestCase]] Cases() {
         $cases = [System.Collections.Generic.List[TestCase]]::new()
