@@ -23,6 +23,20 @@ Each `[[plan]]` lists:
 - `code =` For http/https, the expected status code, default 200.
 - `string =` For http/https, a string we expect to find in the result.
 - `regex =` For http/https, a regular expression we expect to match in the result. **_Not implemented_**
-- `timeout =` An optional timeout for the test in seconds. Default is 3 seconds.
+- `timeout =` An optional timeout for the test in the format `"hh:mm:ss"`. Default is 3 seconds.
+- `certificate =` For http/https, a path to a certificate in the Windows Store to pass as a Client Certificate. If just a Thumbprint is provided, it will look in `cert:\LocalMachine\My`.
 - `tags =` An optional set of tags for the test. Used for when you want to only run a subset of tests with the `-tags` flag **_Not implemented_**
 - `insecureSkipVerify = true` Will allow testing of untrusted or self-signed certificates.
+- `[plan.headers]` For http/https, a list of keys and values to validate the response headers.
+
+## A sample config file
+
+```toml
+[[plan]]
+  label = "google"
+  url = "https://www.google.com"
+  code = 200
+  timeout = "0:0:10"
+  [plan.headers]
+  Server = "gws"
+```

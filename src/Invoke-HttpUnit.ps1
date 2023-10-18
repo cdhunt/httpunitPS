@@ -87,7 +87,18 @@ function Invoke-HttpUnit {
             ParameterSetName = 'url')]
         [Alias('Text')]
         [string]
-        $String
+        $String,
+
+
+        [Parameter(Position = 3,
+            ParameterSetName = 'url')]
+        [hashtable]
+        $Headers,
+
+        [Parameter(Position = 4,
+            ParameterSetName = 'url')]
+        [X509Certificate]
+        $Certificate
     )
 
     if ($PSBoundParameters.ContainsKey('Path')) {
@@ -105,6 +116,20 @@ function Invoke-HttpUnit {
                 'code' { $testPlan.Code = $plan[$_] }
                 'string' { $testPlan.Text = $plan[$_] }
                 'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
+                'headers' {
+                    $asHash = @{}
+                    $plan[$_].ForEach({ $asHash.Add($_.Key, $_.Value) })
+                    $testPlan.Headers = $asHash
+                }
+                'certficate' {
+                    $value = $plan[$_]
+                    if ($value -like 'cert:\*') {
+                        $testPlan.ClientCertificate = Get-Item $value
+                    }
+                    else {
+                        $testPlan.ClientCertificate = (Get-Item "Cert:\LocalMachine\My\$value")
+                    }
+                }
                 'insecureSkipVerify' { $testPlan.InsecureSkipVerify = $plan[$_] }
             }
 
@@ -120,6 +145,8 @@ function Invoke-HttpUnit {
         switch ($PSBoundParameters.Keys) {
             'Code' { $plan.Code = $Code }
             'String' { $plan.Text = $String }
+            'Headers' { $plan.Headers = $Headers }
+            'Certificate' { $plan.ClientCertificate = $Certificate }
         }
 
         foreach ($case in $plan.Cases()) {

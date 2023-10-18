@@ -11,7 +11,9 @@ class TestPlan {
     [string] $Code = "200"
     [string] $Text
     [string] $Regex
+    [hashtable] $Headers
     [bool] $InsecureSkipVerify = $false
+    [X509Certificate] $ClientCertificate
     [timespan] $Timeout = [timespan]::new(0, 0, 3)
 
     [System.Collections.Generic.List[TestCase]] Cases() {
@@ -26,6 +28,11 @@ class TestPlan {
         if (![string]::IsNullOrEmpty($this.Text)) {
             Write-Debug ('Adding simple string matching test case. "{0}"' -f $this.Text)
             $case.ExpectText = $this.Text
+        }
+
+        if ($null -ne $this.Headers) {
+            Write-Debug ('Adding headers test case. Checking for "{0}" headers' -f $this.Headers.Count)
+            $case.ExpectHeaders = $this.Headers
         }
 
         $cases.Add($case)
@@ -44,6 +51,7 @@ class TestCase {
     [System.Net.HttpStatusCode] $ExpectCode
     [string] $ExpectText
     [regex] $ExpectRegex
+    [hashtable] $ExpectHeaders
 
     hidden [version] $_psVersion = $PSVersionTable.PSVersion
 
@@ -71,6 +79,12 @@ class TestCase {
         }
 
         $handler = [Net.Http.HttpClientHandler]::new()
+
+        if ($null -ne $this.Plan.ClientCertificate) {
+            Write-Debug ('TestHttp: ClientCertificate={0}' -f $this.Plan.ClientCertificate.Thumbprint)
+            $handler.ClientCertificates.Add($this.Plan.ClientCertificate)
+        }
+
         $client = [Net.Http.HttpClient]::new($handler)
         $client.DefaultRequestHeaders.Host = $this.URL.Host
         $client.Timeout = $this.Plan.Timeout
@@ -109,11 +123,44 @@ class TestCase {
                 }
             }
 
+            if ($null -ne $this.ExpectHeaders) {
+                Write-Debug ('TestHttp: Headers=@({0})' -f ($this.ExpectHeaders.Keys -join ', '))
+                $headerMatchErrors = @()
+
+                foreach ($keyExpected in $this.ExpectHeaders.Keys) {
+
+                    $expectedValue = $this.ExpectHeaders[$keyExpected]
+
+                    if ($response.Headers.Key -contains $keyExpected) {
+
+                        $foundValue = $response.Headers.Where({ $_.Key -eq $keyExpected }).Value
+
+                        if ($foundValue -eq $expectedValue) {
+                            continue
+                        }
+                        else {
+                            $headerMatchErrors += "$keyExpected=$foundValue, Expecting $expectedValue"
+                        }
+                    }
+                    else {
+                        $headerMatchErrors += "Header '$keyExpected' does not exist"
+                    }
+                }
+
+                if ($headerMatchErrors.Count -gt 0) {
+                    $errorMessage = $headerMatchErrors -join "; "
+                    $exception = [Exception]::new(("Response headers do not match: {0}" -f $errorMessage))
+                    $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "3", "InvalidResult", $response.Headers)
+                }
+                else {
+                    $result.GotHeaders = $true
+                }
+            }
+
         }
         catch [Threading.Tasks.TaskCanceledException] {
-            $result.Result = Write-Error -Message
             $exception = [Exception]::new(("Request timed out after {0:N2}s" -f $this.Plan.Timeout.TotalSeconds))
-            $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "3", "OperationTimeout", $client)
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "4", "OperationTimeout", $client)
         }
         catch {
             $result.Result = $_
@@ -134,6 +181,7 @@ class TestResult {
     [bool] $GotCode
     [bool] $GotText
     [bool] $GotRegex
+    [bool] $GotHeaders
     [bool] $InvalidCert
     [timespan] $TimeTotal
 }
