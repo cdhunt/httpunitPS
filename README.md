@@ -40,3 +40,87 @@ Each `[[plan]]` lists:
   [plan.headers]
   Server = "gws"
 ```
+
+## Help
+
+### Invoke-HttpUnit
+
+```text
+SYNTAX
+    Invoke-HttpUnit [-Url] <String> [[-Code] <String>] [[-String] <String>] [[-Headers] <Hashtable>] [[-Certificate]
+    <X509Certificate>] [<CommonParameters>]
+
+    Invoke-HttpUnit [-Path] <String> [<CommonParameters>]
+
+
+DESCRIPTION
+    This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more
+    closely simulate a .Net client application. It also provides easy access to the Windows Certificate store for
+    client certificate authentication.
+
+
+PARAMETERS
+    -Path <String>
+        Specifies a path to a TOML file with a list of tests.
+
+        Required?                    true
+        Position?                    1
+        Default value
+        Accept pipeline input?       true (ByValue, ByPropertyName)
+        Accept wildcard characters?  false
+
+    -Url <String>
+        The URL to retrieve.
+
+        Required?                    true
+        Position?                    1
+        Default value
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -Code <String>
+        For http/https, the expected status code, default 200.
+
+        Required?                    false
+        Position?                    2
+        Default value
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -String <String>
+        For http/https, a string we expect to find in the result.
+
+        Required?                    false
+        Position?                    3
+        Default value
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -Headers <Hashtable>
+        For http/https, a hashtable to validate the response headers.
+
+        Required?                    false
+        Position?                    4
+        Default value
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -Timeout <TimeSpan>
+        A timeout for the test. Default is 3 seconds.
+
+        Required?                    false
+        Position?                    5
+        Default value
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+
+    -Certificate <X509Certificate>
+        For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that
+        contains a certificate.
+
+        Required?                    false
+        Position?                    5
+        Default value
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+```
