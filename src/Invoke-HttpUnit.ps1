@@ -14,6 +14,8 @@ function Invoke-HttpUnit {
     For http/https, a string we expect to find in the result.
 .PARAMETER Headers
     For http/https, a hashtable to validate the response headers.
+.PARAMETER Timeout
+    A timeout for the test. Default is 3 seconds.
 .PARAMETER Certificate
     For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate.
 .EXAMPLE
@@ -101,6 +103,11 @@ function Invoke-HttpUnit {
 
         [Parameter(Position = 4,
             ParameterSetName = 'url')]
+        [timespan]
+        $Timeout,
+
+        [Parameter(Position = 5,
+            ParameterSetName = 'url')]
         [X509Certificate]
         $Certificate
     )
@@ -150,6 +157,7 @@ function Invoke-HttpUnit {
             'Code' { $plan.Code = $Code }
             'String' { $plan.Text = $String }
             'Headers' { $plan.Headers = $Headers }
+            'Timeout' { $plan.Timeout = $Timeout }
             'Certificate' { $plan.ClientCertificate = $Certificate }
         }
 
