@@ -12,28 +12,28 @@
     RootModule        = 'HttpUnitPS.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.1.0'
+    ModuleVersion     = '0.3.0'
 
     # Supported PSEditions
-    # CompatiblePSEditions = @()
+    CompatiblePSEditions = @('Desktop', 'Core')
 
     # ID used to uniquely identify this module
-    GUID              = '0e2a60bb-00a6-4eae-8806-55bfbb2a8ac3'
+    GUID                 = '0e2a60bb-00a6-4eae-8806-55bfbb2a8ac3'
 
     # Author of this module
-    Author            = 'Chris Hunt'
+    Author               = 'Chris Hunt'
 
     # Company or vendor of this module
-    CompanyName       = 'Unknown'
+    CompanyName          = 'FreedomPay'
 
     # Copyright statement for this module
-    Copyright         = '(c) Chris Hunt. All rights reserved.'
+    Copyright            = '(c) Chris Hunt. All rights reserved.'
 
     # Description of the functionality provided by this module
-    # Description = ''
+    Description          = 'A PowerShell port of httpunit.'
 
     # Minimum version of the PowerShell engine required by this module
-    # PowerShellVersion = ''
+    PowerShellVersion    = '5.1'
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
@@ -54,7 +54,7 @@
     # RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @('System.Net.Http')
+    RequiredAssemblies   = @('System.Net.Http')
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
     # ScriptsToProcess = @()
@@ -69,7 +69,7 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = 'Invoke-HttpUnit'
+    FunctionsToExport    = 'Invoke-HttpUnit'
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     #CmdletsToExport   = '*'
@@ -90,24 +90,28 @@
     # FileList = @()
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData       = @{
+    PrivateData          = @{
 
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags       = @('test-automation')
+            Tags         = @('test-automation')
 
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/cdhunt/httpunitPS/blob/main/LICENSE'
+            LicenseUri   = 'https://github.com/cdhunt/httpunitPS/blob/main/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/cdhunt/httpunitPS'
+            ProjectUri   = 'https://github.com/cdhunt/httpunitPS'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            # ReleaseNotes = ''
+            ReleaseNotes = @'
+4da14ca Add Help section to Readme
+54ebc7d Adds build script
+be42102 Add Timeout parameter to Invoke-HttpUnit
+'@
 
             # Prerelease string of this module
             # Prerelease = ''
