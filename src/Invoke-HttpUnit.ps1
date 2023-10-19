@@ -6,6 +6,9 @@ function Invoke-HttpUnit {
     This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more closely simulate a .Net client application. It also provides easy access to the Windows Certificate store for client certificate authentication.
 .PARAMETER Path
     Specifies a path to a TOML file with a list of tests.
+.PARAMETER Tag
+    If specified, only runs plans that are tagged with one of the
+	tags specified.
 .PARAMETER Url
     The URL to retrieve.
 .PARAMETER Code
@@ -62,8 +65,8 @@ function Invoke-HttpUnit {
 #>
 
     [CmdletBinding(DefaultParameterSetName = 'url')]
+    [Alias('Test-Http')]
     param (
-        # Specifies a path to one or more locations.
         [Parameter(Mandatory,
             Position = 0,
             ParameterSetName = 'config-file',
@@ -75,7 +78,13 @@ function Invoke-HttpUnit {
         [string]
         $Path,
 
-        # Parameter help description
+        [Parameter(Mandatory,
+            Position = 1,
+            ParameterSetName = 'config-file')]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $Tag,
+
         [Parameter(Mandatory,
             Position = 0,
             ParameterSetName = 'url')]
@@ -123,10 +132,12 @@ function Invoke-HttpUnit {
             }
 
             switch ($plan.Keys) {
+                'label' { $testPlan.Label = $plan[$_] }
                 'url' { $testPlan.Url = $plan[$_] }
                 'code' { $testPlan.Code = $plan[$_] }
                 'string' { $testPlan.Text = $plan[$_] }
                 'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
+                'tags' { $testPlan.Tags = $plan[$_] }
                 'headers' {
                     $asHash = @{}
                     $plan[$_].ForEach({ $asHash.Add($_.Key, $_.Value) })
@@ -144,6 +155,19 @@ function Invoke-HttpUnit {
                 'insecureSkipVerify' { $testPlan.InsecureSkipVerify = $plan[$_] }
             }
 
+            # Filter tests
+            if ($PSBoundParameters.ContainsKey('Tag')) {
+                $found = $false
+                foreach ($t in $Tag) {
+                    if ($testPlan.Tags -contains $t) { $found = $true }
+                }
+                if (!$found) {
+                    $testTags = $testPlan.Tags -join ', '
+                    $filterTags = $Tag -join ', '
+                    Write-Debug "Specified tags ($filterTags) do not match defined tags ($testTags)"
+                    Continue
+                }
+            }
             foreach ($case in $testPlan.Cases()) {
                 $case.Test()
             }
