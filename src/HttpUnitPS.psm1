@@ -133,7 +133,7 @@ class TestCase {
 
                         $foundValue = $response.Headers.Where({ $_.Key -eq $keyExpected }).Value
 
-                        if ($foundValue -eq $expectedValue) {
+                        if ($foundValue -like $expectedValue) {
                             continue
                         }
                         else {
