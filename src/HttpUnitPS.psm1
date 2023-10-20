@@ -67,7 +67,7 @@ class TestCase {
     }
 
     [TestResult] TestHttp() {
-        $result = [TestResult]::new()
+        $result = [TestResult]::new($this.Plan.Label)
         $time = Get-Date
 
         Write-Debug ('TestHttp: Url={0} ExpectCode={1}' -f $this.URL.AbsoluteUri, $this.ExpectCode)
@@ -172,6 +172,7 @@ class TestCase {
 }
 
 class TestResult {
+    [string] $Label
     [System.Management.Automation.ErrorRecord] $Result
     hidden [object] $Response
 
@@ -182,6 +183,10 @@ class TestResult {
     [bool] $GotHeaders
     [bool] $InvalidCert
     [timespan] $TimeTotal
+
+    TestResult ([string]$label) {
+        $this.Label = $label
+    }
 }
 
 Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Tomlyn.dll"
