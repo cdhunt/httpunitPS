@@ -65,7 +65,7 @@ function Invoke-HttpUnit {
 #>
 
     [CmdletBinding(DefaultParameterSetName = 'url')]
-    [Alias('Test-Http')]
+    [Alias('httpunit', 'Test-Http', 'ihu')]
     param (
         [Parameter(Mandatory,
             Position = 0,
