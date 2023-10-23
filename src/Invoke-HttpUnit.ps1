@@ -22,44 +22,54 @@ function Invoke-HttpUnit {
 .PARAMETER Certificate
     For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate.
 .EXAMPLE
-    PS > Invoke-HttpUnit -Url https://google.com -Code 200
+    PS > Invoke-HttpUnit -Url https://www.google.com -Code 200
 
+    Label       : https://www.google.com/
     Result      :
     Connected   : True
     GotCode     : True
     GotText     : False
     GotRegex    : False
+    GotHeaders  : False
     InvalidCert : False
-    TimeTotal   : 00:00:06.3031178
-.EXAMPLE
-    PS >  Invoke-HttpUnit -Path .\example.toml
+    TimeTotal   : 00:00:00.4695217
+    .EXAMPLE
+    PS >   Invoke-HttpUnit -Path .\example.toml
 
+    Label       : google
     Result      :
     Connected   : True
     GotCode     : True
     GotText     : False
     GotRegex    : False
+    GotHeaders  : False
     InvalidCert : False
-    TimeTotal   : 00:00:05.9053511
+    TimeTotal   : 00:00:00.3210709
 
-    Result      : Exception calling "Send" with "1" argument(s): "No such host is known. (api.example.com:80)"
+    Label       : api
+    Result      : Exception calling "GetResult" with "0" argument(s): "No such host is known. (api.example.com:80)"
     Connected   : False
     GotCode     : False
     GotText     : False
     GotRegex    : False
+    GotHeaders  : False
     InvalidCert : False
-    TimeTotal   : 00:00:00.0539084
+    TimeTotal   : 00:00:00.0280893
 
-    Result      :
+    Label       : redirect
+    Result      : Unexpected status code: NotFound
     Connected   : True
-    GotCode     : True
+    GotCode     : False
     GotText     : False
     GotRegex    : False
+    GotHeaders  : False
     InvalidCert : False
-    TimeTotal   : 00:00:00.1334766
+    TimeTotal   : 00:00:00.1021738
 .NOTES
     A $null Results property signifies no error and all specified
     test criteria passed.
+
+    You can use the common variable -OutVariable to save the test results. Each TestResult object has a hidden Response property with the raw response from the server.
 .LINK
     https://github.com/StackExchange/httpunit
 #>

@@ -1,21 +1,14 @@
 [[plan]]
   label = "google"
-  url = "https://google.com"
-  code = 200
-
-[[plan]]
-  label = "google"
-  url = "https://google.com"
-  code = "moved"
-
-[[plan]]
-  label = "google"
-  url = "https://www.google.com/"
+  url = "http://www.google.com"
+  code = "ok"
+  tags = ["demo"]
 
 # Verify that this URL returns text that matches "some regex":
 [[plan]]
   label = "api"
   url = "http://api.example.com/"
+  tags = ["demo", "regex"]
   text = "API for example.com"
   regex = "some regex"
 
@@ -26,3 +19,4 @@
   url = "https://example.com/redirect"
   ips = ["*", "10.11.22.33", "10.99.88.77"]
   code = 301
+  tags = ["demo", "ips"]
