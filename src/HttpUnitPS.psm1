@@ -67,6 +67,9 @@ class TestCase {
     }
 
     [TestResult] TestHttp() {
+        if ([string]::IsNullOrEmpty($this.Plan.Label)) {
+            $this.Plan.Label = $this.URL
+        }
         $result = [TestResult]::new($this.Plan.Label)
         $time = Get-Date
 
