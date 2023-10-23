@@ -78,8 +78,7 @@ function Invoke-HttpUnit {
         [string]
         $Path,
 
-        [Parameter(Mandatory,
-            Position = 1,
+        [Parameter(Position = 1,
             ParameterSetName = 'config-file')]
         [ValidateNotNullOrEmpty()]
         [string[]]
