@@ -45,18 +45,23 @@ Each `[[plan]]` lists:
 
 ### Invoke-HttpUnit
 
-```text
-SYNTAX
-    Invoke-HttpUnit [-Url] <String> [[-Code] <String>] [[-String] <String>] [[-Headers] <Hashtable>] [[-Certificate]
-    <X509Certificate>] [<CommonParameters>]
+Aliases: httpunit, ihu, Test-Http
 
-    Invoke-HttpUnit [-Path] <String> [<CommonParameters>]
+```text
+SYNOPSIS
+    A PowerShell port of httpunit.
+
+
+SYNTAX
+    Invoke-HttpUnit [-Url] <String> [[-Code] <String>] [[-String] <String>] [[-Headers] <Hashtable>] [[-Timeout] <TimeSpan>] [[-Certificate] <X509Certificate>]
+    [<CommonParameters>]
+
+    Invoke-HttpUnit [-Path] <String> [[-Tag] <String[]>] [<CommonParameters>]
 
 
 DESCRIPTION
-    This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more
-    closely simulate a .Net client application. It also provides easy access to the Windows Certificate store for
-    client certificate authentication.
+    This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more closely simulate a .Net client application.
+    It also provides easy access to the Windows Certificate store for client certificate authentication.
 
 
 PARAMETERS
@@ -67,6 +72,16 @@ PARAMETERS
         Position?                    1
         Default value
         Accept pipeline input?       true (ByValue, ByPropertyName)
+        Accept wildcard characters?  false
+
+    -Tag <String[]>
+        If specified, only runs plans that are tagged with one of the
+        tags specified.
+
+        Required?                    false
+        Position?                    2
+        Default value
+        Accept pipeline input?       false
         Accept wildcard characters?  false
 
     -Url <String>
@@ -115,11 +130,10 @@ PARAMETERS
         Accept wildcard characters?  false
 
     -Certificate <X509Certificate>
-        For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that
-        contains a certificate.
+        For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate.
 
         Required?                    false
-        Position?                    5
+        Position?                    6
         Default value
         Accept pipeline input?       false
         Accept wildcard characters?  false
