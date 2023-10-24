@@ -1,5 +1,7 @@
 # httpunitPS
 
+<img src="httpunitps_small.png" style="float:right;width:90px;height:90px;padding:20px"/>
+
 A PowerShell port of [httpunit](https://github.com/StackExchange/httpunit).
 
 This is not a 100% accurate port of [httpunit](https://github.com/StackExchange/httpunit).
