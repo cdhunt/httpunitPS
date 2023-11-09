@@ -143,6 +143,7 @@ function Invoke-HttpUnit {
             switch ($plan.Keys) {
                 'label' { $testPlan.Label = $plan[$_] }
                 'url' { $testPlan.Url = $plan[$_] }
+                'method' { $testPlan.Method = $plan[$_] }
                 'code' { $testPlan.Code = $plan[$_] }
                 'string' { $testPlan.Text = $plan[$_] }
                 'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
@@ -177,6 +178,7 @@ function Invoke-HttpUnit {
                     Continue
                 }
             }
+
             foreach ($case in $testPlan.Cases()) {
                 $case.Test()
             }
@@ -192,6 +194,7 @@ function Invoke-HttpUnit {
             'Headers' { $plan.Headers = $Headers }
             'Timeout' { $plan.Timeout = $Timeout }
             'Certificate' { $plan.ClientCertificate = $Certificate }
+            'Method' { $plan.Method = $Method }
         }
 
         foreach ($case in $plan.Cases()) {
