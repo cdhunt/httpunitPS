@@ -12,7 +12,7 @@
     RootModule        = 'HttpUnitPS.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.3.2'
+    ModuleVersion     = '0.3.3'
 
     # Supported PSEditions
     CompatiblePSEditions = @('Desktop', 'Core')
@@ -104,14 +104,10 @@
             ProjectUri   = 'https://github.com/cdhunt/httpunitPS'
 
             # A URL to an icon representing this module.
-            # IconUri = ''
+            IconUri      = 'https://raw.githubusercontent.com/cdhunt/httpunitPS/main/httpunitps_small.png'
 
             # ReleaseNotes of this module
-            ReleaseNotes = @'
-4da14ca Add Help section to Readme
-54ebc7d Adds build script
-be42102 Add Timeout parameter to Invoke-HttpUnit
-'@
+            ReleaseNotes = ''
 
             # Prerelease string of this module
             # Prerelease = ''
