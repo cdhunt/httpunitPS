@@ -96,41 +96,54 @@ function Invoke-HttpUnit {
 
         [Parameter(Mandatory,
             Position = 0,
-            ParameterSetName = 'url')]
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
         [Alias('Address', 'ComputerName')]
         [string]
         $Url,
 
         [Parameter(Position = 1,
-            ParameterSetName = 'url')]
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
         [Alias('StatusCode')]
         [string]
         $Code,
 
         [Parameter(Position = 2,
-            ParameterSetName = 'url')]
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
         [Alias('Text')]
         [string]
         $String,
 
-
         [Parameter(Position = 3,
-            ParameterSetName = 'url')]
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
         [hashtable]
         $Headers,
 
         [Parameter(Position = 4,
-            ParameterSetName = 'url')]
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
         [timespan]
         $Timeout,
 
         [Parameter(Position = 5,
-            ParameterSetName = 'url')]
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
         [X509Certificate]
-        $Certificate
+        $Certificate,
+
+        [Parameter(Position = 6,
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateSet('Connect', 'Delete', 'Get', 'Head', 'Options', 'Patch', 'Post', 'Put', 'Trace')]
+        [String]
+        $Method
     )
 
     if ($PSBoundParameters.ContainsKey('Path')) {
+        Write-Debug "Running checks defined in '$Path'"
         $configContent = Get-Content -Path $Path -Raw
 
         $configObject = [Tomlyn.Toml]::ToModel($configContent)
