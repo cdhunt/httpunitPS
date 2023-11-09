@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Position = 0)]
-    [ValidateSet('clean', 'build')]
+    [ValidateSet('clean', 'build', 'changes', 'publish')]
     [string]
     $Task
 )
@@ -29,6 +29,23 @@ function Build {
     Copy-Item -Path .\README.md -Destination $publish
 }
 
+function Changes {
+    param ()
+
+    git log -n 3 --pretty='format:%h %s'
+}
+
+function Publish {
+    param ()
+
+    $repo = if ($env:PSPublishRepo) { $env:PSPublishRepo } else { 'PSGallery' }
+
+    $notes = Changes
+    $manifest = Join-Path $publish -ChildPath 'HttpUnitPS.psd1'
+    Update-ModuleManifest -Path $manifest -ReleaseNotes $notes
+    Publish-Module -Path $publish -Repository $repo -NuGetApiKey $env:PSPublishApiKey
+}
+
 switch ($Task) {
     'clean' {
         Clean
@@ -36,6 +53,14 @@ switch ($Task) {
     'build' {
         Clean
         Build
+    }
+    'changes' {
+        Changes
+    }
+    'publish' {
+        Clean
+        Build
+        Publish
     }
     Default {
         Clean
