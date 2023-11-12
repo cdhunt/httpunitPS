@@ -142,80 +142,92 @@ function Invoke-HttpUnit {
         $Method
     )
 
-    if ($PSBoundParameters.ContainsKey('Path')) {
-        Write-Debug "Running checks defined in '$Path'"
-        $configContent = Get-Content -Path $Path -Raw
+    Begin {
+        $builder = [OpenTelemetry.Sdk]::CreateTracerProviderBuilder()
+        $builder = [OpenTelemetry.Trace.TracerProviderBuilderExtensions, OpenTelemetry.Instrumentation.Http, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = 7bd6737fe5b67e3c]::AddHttpClientInstrumentation($builder)
+        $builder = [OpenTelemetry.Trace.ConsoleExporterHelperExtensions]::AddConsoleExporter($builder)
+        $builder = [OpenTelemetry.Trace.ZipkinExporterHelperExtensions]::AddZipkinExporter($builder, $zipkinOption)
 
-        $configObject = [Tomlyn.Toml]::ToModel($configContent)
-
-        foreach ($plan in $configObject['plan']) {
-            $testPlan = [TestPlan]@{
-                Label = $plan['label']
-            }
-
-            switch ($plan.Keys) {
-                'label' { $testPlan.Label = $plan[$_] }
-                'url' { $testPlan.Url = $plan[$_] }
-                'method' { $testPlan.Method = $plan[$_] }
-                'code' { $testPlan.Code = $plan[$_] }
-                'string' { $testPlan.Text = $plan[$_] }
-                'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
-                'tags' { $testPlan.Tags = $plan[$_] }
-                'headers' {
-                    $asHash = @{}
-                    $plan[$_].ForEach({ $asHash.Add($_.Key, $_.Value) })
-                    $testPlan.Headers = $asHash
-                }
-                'certficate' {
-                    $value = $plan[$_]
-                    if ($value -like 'cert:\*') {
-                        $testPlan.ClientCertificate = Get-Item $value
-                    }
-                    else {
-                        $testPlan.ClientCertificate = (Get-Item "Cert:\LocalMachine\My\$value")
-                    }
-                }
-                'insecureSkipVerify' { $testPlan.InsecureSkipVerify = $plan[$_] }
-            }
-
-            # Filter tests
-            if ($PSBoundParameters.ContainsKey('Tag')) {
-                $found = $false
-                foreach ($t in $Tag) {
-                    if ($testPlan.Tags -contains $t) { $found = $true }
-                }
-                if (!$found) {
-                    $testTags = $testPlan.Tags -join ', '
-                    $filterTags = $Tag -join ', '
-                    Write-Debug "Specified tags ($filterTags) do not match defined tags ($testTags)"
-                    Continue
-                }
-            }
-
-            foreach ($case in $testPlan.Cases()) {
-                $case.Test()
-            }
-        }
+        $provider = [OpenTelemetry.Trace.TracerProviderBuilderExtensions]::Build($builder)
     }
-    else {
-        $plan = [TestPlan]::new()
-        $plan.URL = $Url
 
-        switch ($PSBoundParameters.Keys) {
-            'Code' { $plan.Code = $Code }
-            'String' { $plan.Text = $String }
-            'Headers' { $plan.Headers = $Headers }
-            'Timeout' { $plan.Timeout = $Timeout }
-            'Certificate' { $plan.ClientCertificate = $Certificate }
-            'Method' { $plan.Method = $Method }
+    Process {
+
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            Write-Debug "Running checks defined in '$Path'"
+            $configContent = Get-Content -Path $Path -Raw
+
+            $configObject = [Tomlyn.Toml]::ToModel($configContent)
+
+            foreach ($plan in $configObject['plan']) {
+                $testPlan = [TestPlan]@{
+                    Label = $plan['label']
+                }
+
+                switch ($plan.Keys) {
+                    'label' { $testPlan.Label = $plan[$_] }
+                    'url' { $testPlan.Url = $plan[$_] }
+                    'method' { $testPlan.Method = $plan[$_] }
+                    'code' { $testPlan.Code = $plan[$_] }
+                    'string' { $testPlan.Text = $plan[$_] }
+                    'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
+                    'tags' { $testPlan.Tags = $plan[$_] }
+                    'headers' {
+                        $asHash = @{}
+                        $plan[$_].ForEach({ $asHash.Add($_.Key, $_.Value) })
+                        $testPlan.Headers = $asHash
+                    }
+                    'certficate' {
+                        $value = $plan[$_]
+                        if ($value -like 'cert:\*') {
+                            $testPlan.ClientCertificate = Get-Item $value
+                        }
+                        else {
+                            $testPlan.ClientCertificate = (Get-Item "Cert:\LocalMachine\My\$value")
+                        }
+                    }
+                    'insecureSkipVerify' { $testPlan.InsecureSkipVerify = $plan[$_] }
+                }
+
+                # Filter tests
+                if ($PSBoundParameters.ContainsKey('Tag')) {
+                    $found = $false
+                    foreach ($t in $Tag) {
+                        if ($testPlan.Tags -contains $t) { $found = $true }
+                    }
+                    if (!$found) {
+                        $testTags = $testPlan.Tags -join ', '
+                        $filterTags = $Tag -join ', '
+                        Write-Debug "Specified tags ($filterTags) do not match defined tags ($testTags)"
+                        Continue
+                    }
+                }
+
+                foreach ($case in $testPlan.Cases()) {
+                    $case.Test()
+                }
+            }
         }
+        else {
+            $plan = [TestPlan]::new()
+            $plan.URL = $Url
 
-        foreach ($case in $plan.Cases()) {
-            $result = $case.Test()
+            switch ($PSBoundParameters.Keys) {
+                'Code' { $plan.Code = $Code }
+                'String' { $plan.Text = $String }
+                'Headers' { $plan.Headers = $Headers }
+                'Timeout' { $plan.Timeout = $Timeout }
+                'Certificate' { $plan.ClientCertificate = $Certificate }
+                'Method' { $plan.Method = $Method }
+            }
 
-            Write-Output $result
-            if ($null -ne $result.Result) {
-                Write-Error -ErrorRecord $result.Result
+            foreach ($case in $plan.Cases()) {
+                $result = $case.Test()
+
+                Write-Output $result
+                if ($null -ne $result.Result) {
+                    Write-Error -ErrorRecord $result.Result
+                }
             }
         }
     }

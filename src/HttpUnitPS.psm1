@@ -86,6 +86,7 @@ class TestCase {
     }
 
     [TestResult] TestHttp() {
+
         if ([string]::IsNullOrEmpty($this.Plan.Label)) {
             $this.Plan.Label = $this.URL
         }
@@ -220,5 +221,64 @@ class TestResult {
 }
 
 Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Tomlyn.dll"
+
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/System.Diagnostics.DiagnosticSource.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/OpenTelemetry.Api.dll"
+
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/OpenTelemetry.Api.ProviderBuilderExtensions.dll"
+
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Extensions.Configuration.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/OpenTelemetry.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/OpenTelemetry.Instrumentation.Http.dll"
+
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Extensions.Options.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Extensions.Primitives.dll"
+
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/OpenTelemetry.Exporter.Console.dll"
+Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/OpenTelemetry.Exporter.Zipkin.dll"
+
+<#
+OpenTelemetry.Instrumentation.Http
+    OpenTelemetry
+        Microsoft.Extensions.Logging.Configuration (>= 3.1.0)
+            Microsoft.Extensions.Configuration (>= 7.0.0)
+            Microsoft.Extensions.Configuration.Abstractions (>= 7.0.0)
+            Microsoft.Extensions.Configuration.Binder (>= 7.0.0)
+            Microsoft.Extensions.DependencyInjection.Abstractions (>= 7.0.0)
+            Microsoft.Extensions.Logging (>= 7.0.0)
+            Microsoft.Extensions.Logging.Abstractions (>= 7.0.0)
+            Microsoft.Extensions.Options (>= 7.0.0)
+            Microsoft.Extensions.Options.ConfigurationExtensions (>= 7.0.0)
+        OpenTelemetry.Api.ProviderBuilderExtensions (>= 1.6.0)
+            Microsoft.Extensions.DependencyInjection.Abstractions (>= 3.1.0)
+                Microsoft.Bcl.AsyncInterfaces (>= 7.0.0)
+                System.Threading.Tasks.Extensions (>= 4.5.4)
+            OpenTelemetry.Api (>= 1.6.0)
+                System.Diagnostics.DiagnosticSource (>= 7.0.2)
+OpenTelemetry.Exporter.Zipkin
+
+Add-Type -Path "./src/lib/netstandard2.0/System.Diagnostics.DiagnosticSource.dll"
+Add-Type -Path "./src/lib/netstandard2.0/OpenTelemetry.Api.dll"
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll"
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll"
+Add-Type -Path "./src/lib/netstandard2.0/OpenTelemetry.Api.ProviderBuilderExtensions.dll"
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Extensions.Configuration.dll"
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.dll"
+Add-Type -Path "./src/lib/netstandard2.0/OpenTelemetry.dll"
+Add-Type -Path "./src/lib/netstandard2.0/OpenTelemetry.Instrumentation.Http.dll" -ErrorAction Stop
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Extensions.Options.dll"
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Extensions.Primitives.dll"
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.dll"
+Add-Type -Path "./src/lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll"
+Add-Type -Path "./src/lib/netstandard2.0/OpenTelemetry.Exporter.Console.dll"
+Add-Type -Path "./src/lib/netstandard2.0/OpenTelemetry.Exporter.Zipkin.dll"
+#>
+
+
 
 . "$PSScriptRoot/Invoke-HttpUnit.ps1"
