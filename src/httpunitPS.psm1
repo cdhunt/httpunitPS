@@ -184,12 +184,20 @@ class TestCase {
             }
 
         }
-        catch [Threading.Tasks.TaskCanceledException] {
+        catch [System.Threading.Tasks.TaskCanceledException] {
             $exception = [Exception]::new(("Request timed out after {0:N2}s" -f $this.Plan.Timeout.TotalSeconds))
             $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "4", "OperationTimeout", $client)
         }
         catch {
-            $result.Result = $_
+            if ($_.Exception.InnerException.HttpRequestError -eq [Net.Http.HttpRequestError]::SecureConnectionError) {
+
+                $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.InnerException.InnerException, "5", "ConnectionError", $client)
+
+                $result.InvalidCert = $true
+            }
+            else {
+                $result.Result = $_.Exception.InnerException
+            }
         }
         finally {
             $result.TimeTotal = (Get-Date) - $time

@@ -19,6 +19,28 @@ Describe 'Invoke-HttpUnit' {
             $result.InvalidCert | Should -Be $False
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
+        It 'Should support string matching' {
+            $result = Invoke-HttpUnit -Url https://example.com/ -String 'Example Domain'
+
+            $result.Label       | Should -Be "https://example.com/"
+            $result.Result      | Should -BeNullOrEmpty
+            $result.Connected   | Should -Be $True
+            $result.GotCode     | Should -Be $True
+            $result.GotText     | Should -Be $true
+            $result.GotRegex    | Should -Be $False
+            $result.GotHeaders  | Should -Be $False
+            $result.InvalidCert | Should -Be $False
+            $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
+        }
+
+        It 'Should report a bad cert' {
+            $result = Invoke-HttpUnit -Url https://expired.badssl.com/ -Quiet
+
+            $result.Result      | Should -not -BeNullOrEmpty
+            $result.Connected   | Should -Be $false
+            $result.InvalidCert | Should -Be $true
+
+        }
     }
     Context 'By Config' {
         It 'Should return 200 for google and find header {Server = "gws"} [<type>]' -ForEach @(
@@ -34,6 +56,20 @@ Describe 'Invoke-HttpUnit' {
             $result.GotText     | Should -Be $False
             $result.GotRegex    | Should -Be $False
             $result.GotHeaders  | Should -Be $true
+            $result.InvalidCert | Should -Be $False
+            $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
+        }
+
+        It 'Should filter by tag' {
+            $result = Invoke-HttpUnit -Path "$PSScriptRoot/testconfig2.yaml" -Tag Run
+
+            $result.Label       | Should -BeExactly "good"
+            $result.Result      | Should -BeNullOrEmpty
+            $result.Connected   | Should -Be $True
+            $result.GotCode     | Should -Be $True
+            $result.GotText     | Should -Be $False
+            $result.GotRegex    | Should -Be $False
+            $result.GotHeaders  | Should -Be $False
             $result.InvalidCert | Should -Be $False
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
