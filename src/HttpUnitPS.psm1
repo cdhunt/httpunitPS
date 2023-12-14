@@ -219,6 +219,3 @@ class TestResult {
     }
 }
 
-Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Tomlyn.dll"
-
-. "$PSScriptRoot/Invoke-HttpUnit.ps1"
