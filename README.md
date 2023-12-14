@@ -8,6 +8,16 @@ This is not a 100% accurate port of [httpunit](https://github.com/StackExchange/
 The goal of this module is to utilize `Net.Http.HttpClient` to more closely simulate a .Net client application.
 It also provides easy access to the Windows Certificate store for client certificate authentication.
 
+## CI
+
+[![PowerShell](https://github.com/cdhunt/httpunitPS/actions/workflows/powershell.yml/badge.svg)](https://github.com/cdhunt/httpunitPS/actions/workflows/powershell.yml)
+
+## Install
+
+[powershellgallery.com/packages/httpunitPS](https://www.powershellgallery.com/packages/httpunitPS)
+
+`Install-Module -Name httpunitPS` or `Install-PSResource -Name httpunitPS`
+
 ## Docs
 
 [Full Docs](docs)
