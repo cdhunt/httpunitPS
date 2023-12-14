@@ -168,6 +168,10 @@ function Publish {
     }
     #>
 
+    Foreach ($type in $manifest.RequiredAssemblies) {
+        [System.Reflection.Assembly]::Load($type)
+    }
+
     $repo = if ($env:PSPublishRepo) { $env:PSPublishRepo } else { 'PSGallery' }
 
     $notes = ChangeLog
@@ -183,7 +187,7 @@ function Docs {
     $HelpToMd = [System.IO.Path]::Combine($src, 'internal', 'Export-HelpToMd.ps1')
     . $HelpToMd
 
-    @('# Import-ConfigData', [System.Environment]::NewLine) | Set-Content -Path "$docs/README.md"
+    @("# $module", [System.Environment]::NewLine) | Set-Content -Path "$docs/README.md"
     $($manifest.Description) | Add-Content -Path "$docs/README.md"
     @('## Cmdlets', [System.Environment]::NewLine) | Add-Content -Path "$docs/README.md"
 
