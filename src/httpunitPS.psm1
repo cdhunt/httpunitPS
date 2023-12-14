@@ -189,15 +189,11 @@ class TestCase {
             $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "4", "OperationTimeout", $client)
         }
         catch {
-            if ($_.Exception.InnerException.HttpRequestError -eq "SecureConnectionError") {
-
-                $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.InnerException.InnerException, "5", "ConnectionError", $client)
-
+            if ($_.Exception.GetBaseException().Message -like 'The remote certificate is invalid*') {
                 $result.InvalidCert = $true
             }
-            else {
-                $result.Result = $_.Exception.InnerException
-            }
+
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $client)
         }
         finally {
             $result.TimeTotal = (Get-Date) - $time
