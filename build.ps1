@@ -64,7 +64,6 @@ $manifest = @{
     RootModule           = "$module.psm1"
     Tags                 = @('test-automation')
     IconUri              = 'https://raw.githubusercontent.com/cdhunt/httpunitPS/main/httpunitps_small.png'
-    RequiredAssemblies   = @('System.Net.Http')
     RequiredModules      = @( @{ModuleName = 'Import-ConfigData'; ModuleVersion = '0.1.15.27666' } )
     CmdletsToExport      = ''
     VariablesToExport    = ''
@@ -167,10 +166,6 @@ function Publish {
         Write-Warning "There are pending Docs change. Run './build.ps1 docs', review and commit updated docs."
     }
     #>
-
-    Foreach ($type in $manifest.RequiredAssemblies) {
-        [System.Reflection.Assembly]::Load($type)
-    }
 
     $repo = if ($env:PSPublishRepo) { $env:PSPublishRepo } else { 'PSGallery' }
 
