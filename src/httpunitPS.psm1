@@ -189,7 +189,7 @@ class TestCase {
             $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "4", "OperationTimeout", $client)
         }
         catch {
-            if ($_.Exception.InnerException.HttpRequestError -eq [Net.Http.HttpRequestError]::SecureConnectionError) {
+            if ($_.Exception.InnerException.HttpRequestError -eq [System.Net.Http.HttpRequestError]::SecureConnectionError) {
 
                 $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.InnerException.InnerException, "5", "ConnectionError", $client)
 
