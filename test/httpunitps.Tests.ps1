@@ -38,6 +38,25 @@ Describe 'Invoke-HttpUnit' {
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
     }
+    Context 'By Value by Pipeline' {
+        It 'Should return 200 for google' {
+            $inputObject = [PSCustomObject]@{
+                Url  = 'https://www.google.com/'
+                Code = 200
+            }
+            $result = $inputObject | Invoke-HttpUnit
+
+            $result.Label       | Should -Be "https://www.google.com/"
+            $result.Result      | Should -BeNullOrEmpty
+            $result.Connected   | Should -Be $True
+            $result.GotCode     | Should -Be $True
+            $result.GotText     | Should -Be $False
+            $result.GotRegex    | Should -Be $False
+            $result.GotHeaders  | Should -Be $False
+            $result.InvalidCert | Should -Be $False
+            $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
+        }
+    }
 }
 
 AfterAll {
