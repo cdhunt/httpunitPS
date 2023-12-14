@@ -1,0 +1,11 @@
+Plan:
+- code: 200
+  label: good
+  timeout: 0:0:10
+  url: https://www.google.com
+  tags: [run]
+- code: 200
+  label: bad
+  timeout: 0:0:10
+  url: bad://www.google.com
+  tags: [do-not-run]

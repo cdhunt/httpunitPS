@@ -5,6 +5,7 @@ class Plans {
 class TestPlan {
     [string] $Label
     [string] $URL
+    [string] $Method = "Get"
     [string[]] $IPs
     [string[]] $Tags
 
@@ -18,9 +19,18 @@ class TestPlan {
 
     [System.Collections.Generic.List[TestCase]] Cases() {
         $cases = [System.Collections.Generic.List[TestCase]]::new()
+        $planUrl = [uri]$this.URL
 
+        <# WIP
+        if ($this.IPs.Count -gt 0) {
+            if ($this.IPs -contains '*') {
+
+                $resolved = Resolve-DnsName -Name $planUrl.Host | Select-Object -ExpandProperty IPAddress
+            }
+        }
+        #>
         $case = [TestCase]@{
-            URL        = [uri]$this.URL
+            URL        = $planUrl
             Plan       = $this
             ExpectCode = [System.Net.HttpStatusCode]$this.Code
         }
@@ -34,6 +44,7 @@ class TestPlan {
             Write-Debug ('Adding headers test case. Checking for "{0}" headers' -f $this.Headers.Count)
             $case.ExpectHeaders = $this.Headers
         }
+
 
         $cases.Add($case)
 
@@ -59,10 +70,18 @@ class TestCase {
         switch ($this.URL.Scheme) {
             http { return $this.TestHttp() }
             https { return $this.TestHttp() }
+            file {
+                $fileTest = [TestResult]::new()
+                $exception = [Exception]::new(("URL Scheme '{0}' is not supported. Did you mean to use the -Path parameter?" -f $this.URL.Scheme ))
+                $fileTest.Result = [System.Management.Automation.ErrorRecord]::new($exception, "100", "InvalidData", $this.URL)
+                return $fileTest
+            }
         }
 
+
         $noTest = [TestResult]::new()
-        $noTest.Result = Write-Error -Message ("no test function implemented for URL Scheme '{0}'" -f $this.URL.Scheme )
+        $exception = [Exception]::new(("no test function implemented for URL Scheme '{0}'" -f $this.URL.Scheme ))
+        $noTest.Result = [System.Management.Automation.ErrorRecord]::new($exception, "100", "InvalidData", $this.URL)
         return $noTest
     }
 
@@ -91,6 +110,7 @@ class TestCase {
         $client.Timeout = $this.Plan.Timeout
         $content = [Net.Http.HttpRequestMessage]::new()
         $content.RequestUri = $this.URL
+        $content.Method = [Net.Http.HttpMethod]$this.Plan.Method
 
         if ($this.Plan.InsecureSkipVerify) {
             Write-Debug ('TestHttp: ValidateSSL={0}' -f $this.Plan.InsecureSkipVerify)
@@ -99,8 +119,9 @@ class TestCase {
 
         try {
 
+            Write-Debug "Sending request"
             $response = $client.SendAsync($content).GetAwaiter().GetResult()
-
+            Write-Debug "Got response"
             $result.Response = $response
             $result.Connected = $true
 
@@ -113,8 +134,12 @@ class TestCase {
             }
 
             if (![string]::IsNullOrEmpty($this.ExpectText)) {
+                Write-Debug ('TestHttp: ExpectText={0}' -f $this.ExpectText)
+
                 $responseContent = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-                Write-Debug ('TestHttp: Response.Content.Length={0} ExpectText={0}' -f $responseContent.Length, $this.ExpectText)
+
+                Write-Debug ('TestHttp: Response.Content.Length={0}' -f $responseContent.Length)
+
                 if (!$responseContent.Contains($this.ExpectText)) {
                     $exception = [Exception]::new(("Response does not contain text {0}" -f $response.ExpectText))
                     $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "2", "InvalidResult", $response)
@@ -159,12 +184,16 @@ class TestCase {
             }
 
         }
-        catch [Threading.Tasks.TaskCanceledException] {
+        catch [System.Threading.Tasks.TaskCanceledException] {
             $exception = [Exception]::new(("Request timed out after {0:N2}s" -f $this.Plan.Timeout.TotalSeconds))
             $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "4", "OperationTimeout", $client)
         }
         catch {
-            $result.Result = $_
+            if ($_.Exception.GetBaseException().Message -like 'The remote certificate is invalid*') {
+                $result.InvalidCert = $true
+            }
+
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $client)
         }
         finally {
             $result.TimeTotal = (Get-Date) - $time
@@ -187,11 +216,10 @@ class TestResult {
     [bool] $InvalidCert
     [timespan] $TimeTotal
 
+    TestResult () {}
+
     TestResult ([string]$label) {
         $this.Label = $label
     }
 }
 
-Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Tomlyn.dll"
-
-. "$PSScriptRoot/Invoke-HttpUnit.ps1"
