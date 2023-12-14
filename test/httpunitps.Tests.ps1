@@ -21,8 +21,11 @@ Describe 'Invoke-HttpUnit' {
         }
     }
     Context 'By Config' {
-        It 'Should return 200 for google and find header {Server = "gws"}' {
-            $result = Invoke-HttpUnit -Path "$PSScriptRoot/testconfig1.toml"
+        It 'Should return 200 for google and find header {Server = "gws"} [<type>]' -ForEach @(
+            @{ config = "$PSScriptRoot/testconfig1.psd1"; type = 'PSD1' }
+            @{ config = "$PSScriptRoot/testconfig1.toml"; type = 'TOML' }
+        ) {
+            $result = Invoke-HttpUnit -Path $config
 
             $result.Label       | Should -BeExactly "google"
             $result.Result      | Should -BeNullOrEmpty

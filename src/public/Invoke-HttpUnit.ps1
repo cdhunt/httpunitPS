@@ -164,11 +164,7 @@ function Invoke-HttpUnit {
                 'string' { $testPlan.Text = $plan[$_] }
                 'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
                 'tags' { $testPlan.Tags = $plan[$_] }
-                'headers' {
-                    $asHash = @{}
-                    $plan[$_].ForEach({ $asHash.Add($_.Key, $_.Value) })
-                    $testPlan.Headers = $asHash
-                }
+                'headers' { $testPlan.Headers = $plan[$_] }
                 'certficate' {
                     $value = $plan[$_]
                     if ($value -like 'cert:\*') {
