@@ -39,8 +39,12 @@ Describe 'Invoke-HttpUnit' {
             $result.Result      | Should -not -BeNullOrEmpty
             $result.Connected   | Should -Be $false
             $result.InvalidCert | Should -Be $true
-            $result.Result.Exception.Message | Should -Be 'The remote certificate is invalid because of errors in the certificate chain: NotTimeValid'
-
+            if ($PSVersionTable.PSVersion -ge [version]"7.3") {
+                $result.Result.Exception.Message | Should -Be 'The remote certificate is invalid because of errors in the certificate chain: NotTimeValid'
+            }
+            else {
+                $result.Result.Exception.Message | Should -Be 'The remote certificate is invalid according to the validation procedure.'
+            }
         }
     }
     Context 'By Config' {
