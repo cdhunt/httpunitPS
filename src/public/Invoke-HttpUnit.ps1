@@ -5,10 +5,9 @@ function Invoke-HttpUnit {
 .DESCRIPTION
     This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more closely simulate a .Net client application. It also provides easy access to the Windows Certificate store for client certificate authentication.
 .PARAMETER Path
-    Specifies a path to a TOML file with a list of tests.
+    Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1.
 .PARAMETER Tag
-    If specified, only runs plans that are tagged with one of the
-	tags specified.
+    If specified, only runs plans that are tagged with one of the tags specified.
 .PARAMETER Url
     The URL to retrieve.
 .PARAMETER Code
@@ -21,6 +20,10 @@ function Invoke-HttpUnit {
     A timeout for the test. Default is 3 seconds.
 .PARAMETER Certificate
     For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate.
+.PARAMETER Method
+    For http/https, the HTTP method to send.
+.PARAMETER Quiet
+    Do not output ErrorRecords for failed tests.
 .EXAMPLE
     PS > Invoke-HttpUnit -Url https://www.google.com -Code 200
     Label       : https://www.google.com/
@@ -142,7 +145,11 @@ function Invoke-HttpUnit {
             ValueFromPipelineByPropertyName = $true)]
         [ValidateSet('Connect', 'Delete', 'Get', 'Head', 'Options', 'Patch', 'Post', 'Put', 'Trace')]
         [String]
-        $Method
+        $Method,
+
+        [Parameter()]
+        [Switch]
+        $Quiet
     )
 
     if ($PSBoundParameters.ContainsKey('Path')) {
@@ -213,7 +220,7 @@ function Invoke-HttpUnit {
             $result = $case.Test()
 
             Write-Output $result
-            if ($null -ne $result.Result) {
+            if ($null -ne $result.Result -and !$Quiet) {
                 Write-Error -ErrorRecord $result.Result
             }
         }

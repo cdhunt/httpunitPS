@@ -14,15 +14,16 @@ This is not a 100% accurate port of httpunit. The goal of this module is to util
 - `[Hashtable]` **Headers** _For http/https, a hashtable to validate the response headers._  
 - `[TimeSpan]` **Timeout** _A timeout for the test. Default is 3 seconds._  
 - `[X509Certificate]` **Certificate** _For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate._  
-- `[String]` **Method** _Parameter help description_  
+- `[String]` **Method** _For http/https, the HTTP method to send._  
+- `[switch]` **Quiet** _Do not output ErrorRecords for failed tests._  
 
 
 ### Parameter Set 2
 
 
-- `[String]` **Path** _Specifies a path to a TOML file with a list of tests._  Mandatory, ValueFromPipeline
-- `[String[]]` **Tag** _If specified, only runs plans that are tagged with one of the
-tags specified._  
+- `[String]` **Path** _Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1._  Mandatory, ValueFromPipeline
+- `[String[]]` **Tag** _If specified, only runs plans that are tagged with one of the tags specified._  
+- `[switch]` **Quiet** _Do not output ErrorRecords for failed tests._  
 
 
 ## Examples
