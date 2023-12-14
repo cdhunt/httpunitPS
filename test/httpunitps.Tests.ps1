@@ -39,6 +39,7 @@ Describe 'Invoke-HttpUnit' {
             $result.Result      | Should -not -BeNullOrEmpty
             $result.Connected   | Should -Be $false
             $result.InvalidCert | Should -Be $true
+            $result.Result.Exception.Message | Should -Be 'The remote certificate is invalid because of errors in the certificate chain: NotTimeValid'
 
         }
     }
