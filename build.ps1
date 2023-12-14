@@ -65,7 +65,7 @@ $manifest = @{
     Tags                 = @('test-automation')
     IconUri              = 'https://raw.githubusercontent.com/cdhunt/httpunitPS/main/httpunitps_small.png'
     RequiredAssemblies   = @('System.Net.Http')
-    RequiredModules      = @( @{ModuleName = 'Import-ConfigData'; ModuleVersion = '0.1.3' } )
+    RequiredModules      = @( @{ModuleName = 'Import-ConfigData'; ModuleVersion = '0.1.10.30942' } )
     CmdletsToExport      = ''
     VariablesToExport    = ''
     AliasesToExport      = @('httpunit', 'Test-Http', 'ihu')
