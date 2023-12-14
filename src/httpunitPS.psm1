@@ -184,12 +184,16 @@ class TestCase {
             }
 
         }
-        catch [Threading.Tasks.TaskCanceledException] {
+        catch [System.Threading.Tasks.TaskCanceledException] {
             $exception = [Exception]::new(("Request timed out after {0:N2}s" -f $this.Plan.Timeout.TotalSeconds))
             $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "4", "OperationTimeout", $client)
         }
         catch {
-            $result.Result = $_
+            if ($_.Exception.GetBaseException().Message -like 'The remote certificate is invalid*') {
+                $result.InvalidCert = $true
+            }
+
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $client)
         }
         finally {
             $result.TimeTotal = (Get-Date) - $time
@@ -219,6 +223,3 @@ class TestResult {
     }
 }
 
-Add-Type -Path "$PSScriptRoot/lib/netstandard2.0/Tomlyn.dll"
-
-. "$PSScriptRoot/Invoke-HttpUnit.ps1"

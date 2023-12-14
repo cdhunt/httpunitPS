@@ -5,10 +5,9 @@ function Invoke-HttpUnit {
 .DESCRIPTION
     This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more closely simulate a .Net client application. It also provides easy access to the Windows Certificate store for client certificate authentication.
 .PARAMETER Path
-    Specifies a path to a TOML file with a list of tests.
+    Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1.
 .PARAMETER Tag
-    If specified, only runs plans that are tagged with one of the
-	tags specified.
+    If specified, only runs plans that are tagged with one of the tags specified.
 .PARAMETER Url
     The URL to retrieve.
 .PARAMETER Code
@@ -21,9 +20,12 @@ function Invoke-HttpUnit {
     A timeout for the test. Default is 3 seconds.
 .PARAMETER Certificate
     For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate.
+.PARAMETER Method
+    For http/https, the HTTP method to send.
+.PARAMETER Quiet
+    Do not output ErrorRecords for failed tests.
 .EXAMPLE
     PS > Invoke-HttpUnit -Url https://www.google.com -Code 200
-
     Label       : https://www.google.com/
     Result      :
     Connected   : True
@@ -33,9 +35,11 @@ function Invoke-HttpUnit {
     GotHeaders  : False
     InvalidCert : False
     TimeTotal   : 00:00:00.4695217
+
+    Run an ad-hoc test against one Url.
+
     .EXAMPLE
     PS >   Invoke-HttpUnit -Path .\example.toml
-
     Label       : google
     Result      :
     Connected   : True
@@ -45,7 +49,6 @@ function Invoke-HttpUnit {
     GotHeaders  : False
     InvalidCert : False
     TimeTotal   : 00:00:00.3210709
-
     Label       : api
     Result      : Exception calling "GetResult" with "0" argument(s): "No such host is known. (api.example.com:80)"
     Connected   : False
@@ -55,7 +58,6 @@ function Invoke-HttpUnit {
     GotHeaders  : False
     InvalidCert : False
     TimeTotal   : 00:00:00.0280893
-
     Label       : redirect
     Result      : Unexpected status code: NotFound
     Connected   : True
@@ -65,6 +67,8 @@ function Invoke-HttpUnit {
     GotHeaders  : False
     InvalidCert : False
     TimeTotal   : 00:00:00.1021738
+
+    Run all of the tests in a given config file.
 .NOTES
     A $null Results property signifies no error and all specified
     test criteria passed.
@@ -72,6 +76,8 @@ function Invoke-HttpUnit {
     You can use the common variable -OutVariable to save the test results. Each TestResult object has a hidden Response property with the raw response from the server.
 .LINK
     https://github.com/StackExchange/httpunit
+.LINK
+    https://github.com/cdhunt/Import-ConfigData
 #>
 
     [CmdletBinding(DefaultParameterSetName = 'url')]
@@ -139,14 +145,18 @@ function Invoke-HttpUnit {
             ValueFromPipelineByPropertyName = $true)]
         [ValidateSet('Connect', 'Delete', 'Get', 'Head', 'Options', 'Patch', 'Post', 'Put', 'Trace')]
         [String]
-        $Method
+        $Method,
+
+        [Parameter()]
+        [Switch]
+        $Quiet
     )
 
     if ($PSBoundParameters.ContainsKey('Path')) {
         Write-Debug "Running checks defined in '$Path'"
-        $configContent = Get-Content -Path $Path -Raw
 
-        $configObject = [Tomlyn.Toml]::ToModel($configContent)
+
+        $configObject = Import-ConfigData -Path $Path
 
         foreach ($plan in $configObject['plan']) {
             $testPlan = [TestPlan]@{
@@ -161,11 +171,7 @@ function Invoke-HttpUnit {
                 'string' { $testPlan.Text = $plan[$_] }
                 'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
                 'tags' { $testPlan.Tags = $plan[$_] }
-                'headers' {
-                    $asHash = @{}
-                    $plan[$_].ForEach({ $asHash.Add($_.Key, $_.Value) })
-                    $testPlan.Headers = $asHash
-                }
+                'headers' { $testPlan.Headers = $plan[$_] }
                 'certficate' {
                     $value = $plan[$_]
                     if ($value -like 'cert:\*') {
@@ -214,7 +220,7 @@ function Invoke-HttpUnit {
             $result = $case.Test()
 
             Write-Output $result
-            if ($null -ne $result.Result) {
+            if ($null -ne $result.Result -and !$Quiet) {
                 Write-Error -ErrorRecord $result.Result
             }
         }
