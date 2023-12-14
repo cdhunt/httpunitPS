@@ -1,6 +1,6 @@
 BeforeAll {
 
-    Import-Module "$PSScriptRoot/../publish/httpunitps" -Force
+    Import-Module "$PSScriptRoot/../publish/httpunitPS" -Force
 
 }
 
@@ -38,5 +38,5 @@ Describe 'Invoke-HttpUnit' {
 }
 
 AfterAll {
-    Remove-Module httpunitps
+    Remove-Module httpunitPS
 }
