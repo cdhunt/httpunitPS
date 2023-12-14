@@ -35,7 +35,7 @@ if ( (Get-Command 'nbgv' -CommandType Application -ErrorAction SilentlyContinue)
     if (!$PSBoundParameters.ContainsKey('Revision')) { $Revision = $(nbgv get-version -v VersionRevision) }
 }
 
-$module = 'httpunitps'
+$module = 'httpunitPS'
 $parent = $PSScriptRoot
 $parent = if ([string]::IsNullOrEmpty($parent)) { $pwd.Path } else { $parent }
 $src = Join-Path $parent -ChildPath "src"
