@@ -176,24 +176,25 @@ function Publish {
 function Docs {
     param ()
 
+    Import-Module C:\source\Build-Docs\publish\Build-Docs\
     Import-Module $publish -Force
 
-    $commands = Get-Command -Module $module -CommandType Function
-    $HelpToMd = [System.IO.Path]::Combine($src, 'internal', 'Export-HelpToMd.ps1')
-    . $HelpToMd
+    $help = Get-HelpModuleData $module
 
-    @("# $module", [System.Environment]::NewLine) | Set-Content -Path "$docs/README.md"
-    $($manifest.Description) | Add-Content -Path "$docs/README.md"
-    @('## Cmdlets', [System.Environment]::NewLine) | Add-Content -Path "$docs/README.md"
+    # docs/README.md
+    $help | New-HelpDoc |
+    Add-ModuleProperty Name -H1 |
+    Add-ModuleProperty Description |
+    Add-HelpDocText "Commands" -H2 |
+    Add-ModuleCommands -AsLinks |
+    Out-HelpDoc -Path 'docs/README.md'
 
-    foreach ($command in $Commands | Sort-Object -Property Verb) {
+    # Individual Commands
+    foreach ($command in $help.Commands) {
         $name = $command.Name
-        $docPath = Join-Path -Path $docs -ChildPath "$name.md"
-        $help = Get-Help -Name $name
-
-        Export-HelpToMd $help | Set-Content -Path $docPath
-
-        "- [$name]($name.md) $($help.Synopsis)" | Add-Content -Path "$docs/README.md"
+        $doc = New-HelpDoc -HelpModuleData $help
+        $doc.Text = $command.ToMD()
+        $doc | Out-HelpDoc -Path "docs/$name.md"
     }
 
     ChangeLog | Set-Content -Path "$parent/Changelog.md"

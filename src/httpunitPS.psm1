@@ -128,8 +128,7 @@ class TestCase {
             if ($response.StatusCode -ne $this.ExpectCode) {
                 $exception = [Exception]::new(("Unexpected status code: {0}" -f $response.StatusCode))
                 $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "1", "InvalidResult", $response)
-            }
-            else {
+            } else {
                 $result.GotCode = $true
             }
 
@@ -143,8 +142,7 @@ class TestCase {
                 if (!$responseContent.Contains($this.ExpectText)) {
                     $exception = [Exception]::new(("Response does not contain text {0}" -f $response.ExpectText))
                     $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "2", "InvalidResult", $response)
-                }
-                else {
+                } else {
                     $result.GotText = $true
                 }
             }
@@ -163,12 +161,10 @@ class TestCase {
 
                         if ($foundValue -like $expectedValue) {
                             continue
-                        }
-                        else {
+                        } else {
                             $headerMatchErrors += "$keyExpected=$foundValue, Expecting $expectedValue"
                         }
-                    }
-                    else {
+                    } else {
                         $headerMatchErrors += "Header '$keyExpected' does not exist"
                     }
                 }
@@ -177,25 +173,21 @@ class TestCase {
                     $errorMessage = $headerMatchErrors -join "; "
                     $exception = [Exception]::new(("Response headers do not match: {0}" -f $errorMessage))
                     $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "3", "InvalidResult", $response.Headers)
-                }
-                else {
+                } else {
                     $result.GotHeaders = $true
                 }
             }
 
-        }
-        catch [System.Threading.Tasks.TaskCanceledException] {
+        } catch [System.Threading.Tasks.TaskCanceledException] {
             $exception = [Exception]::new(("Request timed out after {0:N2}s" -f $this.Plan.Timeout.TotalSeconds))
             $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "4", "OperationTimeout", $client)
-        }
-        catch {
+        } catch {
             if ($_.Exception.GetBaseException().Message -like 'The remote certificate is invalid*') {
                 $result.InvalidCert = $true
             }
 
             $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $client)
-        }
-        finally {
+        } finally {
             $result.TimeTotal = (Get-Date) - $time
         }
 
@@ -223,3 +215,5 @@ class TestResult {
     }
 }
 
+# https://learn.microsoft.com/en-us/dotnet/api/system.net.security.remotecertificatevalidationcallback?view=net-8.0
+$ServerCertificateCustomValidation_AlwaysTrust = { param($senderObject, $cert, $chain, $errors) return $true }

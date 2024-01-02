@@ -1,39 +1,31 @@
 # Invoke-HttpUnit
 
-
 This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more closely simulate a .Net client application. It also provides easy access to the Windows Certificate store for client certificate authentication.
-## Parameters
 
+## Parameters
 
 ### Parameter Set 1
 
-
-- `[String]` **Url** _The URL to retrieve._  Mandatory
-- `[String]` **Code** _For http/https, the expected status code, default 200._  
-- `[String]` **String** _For http/https, a string we expect to find in the result._  
-- `[Hashtable]` **Headers** _For http/https, a hashtable to validate the response headers._  
-- `[TimeSpan]` **Timeout** _A timeout for the test. Default is 3 seconds._  
-- `[X509Certificate]` **Certificate** _For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate._  
-- `[String]` **Method** _For http/https, the HTTP method to send._  
-- `[switch]` **Quiet** _Do not output ErrorRecords for failed tests._  
-
+- `[String]` **Url** _The URL to retrieve._ Mandatory
+- `[String]` **Code** _For http/https, the expected status code, default 200._ 
+- `[String]` **String** _For http/https, a string we expect to find in the result._ 
+- `[Hashtable]` **Headers** _For http/https, a hashtable to validate the response headers._ 
+- `[TimeSpan]` **Timeout** _A timeout for the test. Default is 3 seconds._ 
+- `[X509Certificate]` **Certificate** _For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate._ 
+- `[String]` **Method** _For http/https, the HTTP method to send._ 
+- `[Switch]` **Quiet** _Do not output ErrorRecords for failed tests._ 
 
 ### Parameter Set 2
 
-
-- `[String]` **Path** _Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1._  Mandatory, ValueFromPipeline
-- `[String[]]` **Tag** _If specified, only runs plans that are tagged with one of the tags specified._  
-- `[switch]` **Quiet** _Do not output ErrorRecords for failed tests._  
-
+- `[String]` **Path** _Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1._ Mandatory, ValueFromPipeline
+- `[String[]]` **Tag** _If specified, only runs plans that are tagged with one of the tags specified._ 
+- `[Switch]` **Quiet** _Do not output ErrorRecords for failed tests._ 
 
 ## Examples
 
-
 ### Example 1
 
-
 Run an ad-hoc test against one Url.
-
 
 ```powershell
 Invoke-HttpUnit -Url https://www.google.com -Code 200
@@ -47,13 +39,9 @@ GotHeaders  : False
 InvalidCert : False
 TimeTotal   : 00:00:00.4695217
 ```
-
-
 ### Example 2
 
-
 Run all of the tests in a given config file.
-
 
 ```powershell
 Invoke-HttpUnit -Path .\example.toml
@@ -86,9 +74,7 @@ InvalidCert : False
 TimeTotal   : 00:00:00.1021738
 ```
 
-
 ## Links
-
 
 - [https://github.com/StackExchange/httpunit](https://github.com/StackExchange/httpunit)
 - [https://github.com/cdhunt/Import-ConfigData](https://github.com/cdhunt/Import-ConfigData)
