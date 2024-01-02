@@ -9,7 +9,7 @@ function Show-SSLCertificateUI {
 .PARAMETER ComputerName
     A hostname or Url of the server to retreive the certificate to test.
 .PARAMETER Port
-    The port to connet to the remote server.
+    The port to connect to the remote server.
 .NOTES
     PowerShell processing is blocked until the certificates dialg box is closed.
 .LINK

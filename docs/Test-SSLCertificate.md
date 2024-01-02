@@ -19,7 +19,7 @@ NoCheck: No revocation check is performed on the certificate.
 Offline: A revocation check is made using a cached certificate revocation list (CRL).
 Online: A revocation check is made using an online certificate revocation list (CRL)._ 
 - `[String]` **ComputerName** _A hostname or Url of the server to retreive the certificate to test._ Mandatory
-- `[Int32]` **Port** _The port to connet to the remote server._ 
+- `[Int32]` **Port** _The port to connect to the remote server._ 
 
 ## Examples
 

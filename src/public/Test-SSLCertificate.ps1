@@ -14,7 +14,7 @@ function Test-SSLCertificate {
 .PARAMETER ComputerName
     A hostname or Url of the server to retreive the certificate to test.
 .PARAMETER Port
-    The port to connet to the remote server.
+    The port to connect to the remote server.
 .NOTES
     Test-SSLCertificate takes into consideration the status of each element in the chain.
 .LINK

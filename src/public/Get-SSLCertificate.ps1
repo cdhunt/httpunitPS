@@ -7,11 +7,13 @@ function Get-SSLCertificate {
 .PARAMETER ComputerName
     A hostname or Url of the server to retreive the certificate.
 .PARAMETER Port
-    The port to connet to the remote server.
+    The port to connect to the remote server.
 .NOTES
     No validation check done. This command will trust all certificates presented.
 .LINK
     Invoke-HttpUnit
+.LINK
+    Test-SSLCertificate
 .INPUTS
     String
 .OUTPUTS
@@ -22,13 +24,13 @@ function Get-SSLCertificate {
     ----------                                -------              --------------------
     9B97772CC2C860B0D0663AD3ED34272FF927EDEE  CN=*.google.com      Server Authentication
 
-    Return the certificate for google.com
+    Return the certificate for google.com.
 .EXAMPLE
     $cert = Get-SSLCertificate expired.badssl.com
     $cert.Verify()
     False
 
-    Verify a server certificates
+    Verify a server certificate. You can use Test-SSLCertificate to validate the entire certificate chain.
 #>
 
     [CmdletBinding()]

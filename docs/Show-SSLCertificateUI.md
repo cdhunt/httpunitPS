@@ -11,7 +11,7 @@ Displays a dialog box with detailed information about the specified x509 certifi
 ### Parameter Set 2
 
 - `[String]` **ComputerName** _A hostname or Url of the server to retreive the certificate to test._ Mandatory
-- `[Int32]` **Port** _The port to connet to the remote server._ 
+- `[Int32]` **Port** _The port to connect to the remote server._ 
 
 ## Examples
 
