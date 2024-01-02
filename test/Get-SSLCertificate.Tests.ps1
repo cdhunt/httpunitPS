@@ -17,6 +17,24 @@ Describe 'Get-SSLCertificate' {
 
     }
 
+    Context 'SslStreamVariable' {
+        BeforeEach {
+            Remove-Variable -Name sslStreamValue -ErrorAction SilentlyContinue
+        }
+
+        It "Sets SslStreamVariable" {
+            $cert = Get-SSLCertificate -ComputerName 'google.com' -OutSslStreamVariable sslStreamValue
+            $sslStreamvalue | Should -Not -BeNullOrEmpty
+            $sslStreamvalue.CipherAlgorithm | Should -BeOfType 'Security.Authentication.CipherAlgorithmType'
+            $sslStreamvalue.CipherStrength | Should -BeIn @(0, 40, 56, 80, 128, 168, 192, 256)
+            $sslStreamvalue.HashAlgorithm | Should -BeOfType 'Security.Authentication.HashAlgorithmType'
+            $sslStreamvalue.HashStrength | Should -BeIn @(0, 128, 160)
+            $sslStreamvalue.KeyExchangeAlgorithm | Should -BeOfType 'Security.Authentication.ExchangeAlgorithmType'
+            $sslStreamvalue.KeyExchangeStrength | Should -BeIn @(0, 256, 512, 768, 1024, 2048)
+            $sslStreamvalue.SslProtocol | Should -BeOfType 'Security.Authentication.SslProtocols'
+        }
+    }
+
     Context 'Invalid' {
         It "Returns <expected> (<name>)" -ForEach @(
             @{name = 'expired.badssl.com'; expected = 'CN=*.badssl.com, OU=PositiveSSL Wildcard, OU=Domain Control Validated' }

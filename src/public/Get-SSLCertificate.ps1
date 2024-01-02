@@ -8,6 +8,8 @@ function Get-SSLCertificate {
     A hostname or Url of the server to retreive the certificate.
 .PARAMETER Port
     The port to connect to the remote server.
+.PARAMETER OutSslStreamVariable
+    Stores SslStream connetion details from the command in the specified variable.
 .NOTES
     No validation check done. This command will trust all certificates presented.
 .LINK
@@ -31,6 +33,31 @@ function Get-SSLCertificate {
     False
 
     Verify a server certificate. You can use Test-SSLCertificate to validate the entire certificate chain.
+.EXAMPLE
+    Get-SSLCertificate google.com -verbose
+    VERBOSE: Converting Uri to host string
+    VERBOSE: ComputerName = google.com
+    VERBOSE: Cipher: Aes256 strength 256
+    VERBOSE: Hash: Sha384 strength 0
+    VERBOSE: Key exchange: None strength 0
+    VERBOSE: Protocol: Tls13
+
+    View details of negotiated protocol and crypto parameters.
+.EXAMPLE
+    PS> Get-SSLCertificate -ComputerName 'google.com' -OutSslStreamVariable sslStreamValue
+    Thumbprint                                Subject              EnhancedKeyUsageList
+    ----------                                -------              --------------------
+    5D3AD94714B07830A1BFB445F6F581AD0AC77689  CN=*.google.com      Server Authentication
+    $sslStreamValue
+    CipherAlgorithm      : Aes256
+    CipherStrength       : 256
+    HashAlgorithm        : Sha384
+    HashStrength         : 0
+    KeyExchangeAlgorithm : None
+    KeyExchangeStrength  : 0
+    SslProtocol          : Tls13
+
+    Stores SslStream connetion details in the `$sslStreamValue` variable.
 #>
 
     [CmdletBinding()]
@@ -41,7 +68,11 @@ function Get-SSLCertificate {
 
         [Parameter(Position = 1)]
         [ValidateRange(1, 65535)]
-        [int]$Port = 443
+        [int]$Port = 443,
+
+        [Parameter()]
+        [string]
+        $OutSslStreamVariable
 
     )
 
@@ -69,6 +100,25 @@ function Get-SSLCertificate {
 
             $SslStream.AuthenticateAsClient($ComputerName)
             $Certificate = $SslStream.RemoteCertificate
+
+            if ($PSBoundParameters.ContainsKey('OutSslStreamVariable')) {
+                $streamProperties = [PSCustomObject]@{
+                    CipherAlgorithm      = $SslStream.CipherAlgorithm
+                    CipherStrength       = $SslStream.CipherStrength
+                    HashAlgorithm        = $SslStream.HashAlgorithm
+                    HashStrength         = $SslStream.HashStrength
+                    KeyExchangeAlgorithm = $SslStream.KeyExchangeAlgorithm
+                    KeyExchangeStrength  = $SslStream.KeyExchangeStrength
+                    SslProtocol          = $SslStream.SslProtocol
+                }
+
+                Set-Variable -Name $OutSslStreamVariable -Value $streamProperties -Scope Global
+            }
+
+            "Cipher: {0} strength {1}" -f $SslStream.CipherAlgorithm, $SslStream.CipherStrength | Write-Verbose
+            "Hash: {0} strength {1}" -f $SslStream.HashAlgorithm, $SslStream.HashStrength | Write-Verbose
+            "Key exchange: {0} strength {1}" -f $SslStream.KeyExchangeAlgorithm, $SslStream.KeyExchangeStrength | Write-Verbose
+            "Protocol: {0}" -f $SslStream.SslProtocol | Write-Verbose
 
         } catch {
             $_
