@@ -33,10 +33,10 @@ False
 ```
 ### Example 3
 
-View details of negotiated protocol and crypto parameters.
+Write SslStream connection details to Verbose stream.
 
 ```powershell
-Get-SSLCertificate google.com -verbose
+$cert = Get-SSLCertificate google.com -verbose
 VERBOSE: Converting Uri to host string
 VERBOSE: ComputerName = google.com
 VERBOSE: Cipher: Aes256 strength 256
@@ -46,7 +46,7 @@ VERBOSE: Protocol: Tls13
 ```
 ### Example 4
 
-Stores SslStream connetion details in the `$sslStreamValue` variable.
+Stores SslStream connection details in the `$sslStreamValue` variable.
 
 ```powershell
 Get-SSLCertificate -ComputerName 'google.com' -OutSslStreamVariable sslStreamValue

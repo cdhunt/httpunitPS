@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5
+
+- Adds SSLCertificate commands
+
 ## v0.4
 
 - Switch to [Import-ConfigData](https://github.com/cdhunt/Import-ConfigData) for Toml parsing

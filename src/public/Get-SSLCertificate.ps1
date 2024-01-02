@@ -34,7 +34,7 @@ function Get-SSLCertificate {
 
     Verify a server certificate. You can use Test-SSLCertificate to validate the entire certificate chain.
 .EXAMPLE
-    Get-SSLCertificate google.com -verbose
+    $cert = Get-SSLCertificate google.com -verbose
     VERBOSE: Converting Uri to host string
     VERBOSE: ComputerName = google.com
     VERBOSE: Cipher: Aes256 strength 256
@@ -42,7 +42,7 @@ function Get-SSLCertificate {
     VERBOSE: Key exchange: None strength 0
     VERBOSE: Protocol: Tls13
 
-    View details of negotiated protocol and crypto parameters.
+    Write SslStream connection details to Verbose stream.
 .EXAMPLE
     PS> Get-SSLCertificate -ComputerName 'google.com' -OutSslStreamVariable sslStreamValue
     Thumbprint                                Subject              EnhancedKeyUsageList
@@ -57,7 +57,7 @@ function Get-SSLCertificate {
     KeyExchangeStrength  : 0
     SslProtocol          : Tls13
 
-    Stores SslStream connetion details in the `$sslStreamValue` variable.
+    Stores SslStream connection details in the `$sslStreamValue` variable.
 #>
 
     [CmdletBinding()]
