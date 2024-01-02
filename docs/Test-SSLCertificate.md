@@ -33,18 +33,19 @@ True
 ```
 ### Example 2
 
-Tests an invalid certificates and inspect the `$error` collection for the certificate details.
+Tests an invalid certificates and inspect the error in variable `$validation` for the certificate details.
 
 ```powershell
-Test-SSLCertificate expired.badssl.com
+Test-SSLCertificate expired.badssl.com -ErrorVariable validation
 Test-SSLCertificate: Certificate failed chain validation:
-A certificate chain could not be built to a trusted root authority.
 A required certificate is not within its validity period when verifying against the current system clock or the timestamp in the signed file.
-The revocation function was unable to check revocation for the certificate.
-The revocation function was unable to check revocation because the revocation server was offline.
 False
-PS > $error[0].TargetObject.ChainElements.Certificate.Subject
-CN=badssl-fallback-unknown-subdomain-or-no-sni, O=BadSSL Fallback. Unknown subdomain or no SNI., L=San Francisco, S=California, C=US
+$validation.TargetObject.ChainElements.Certificate
+Thumbprint                                Subject              EnhancedKeyUsageList
+----------                                -------              --------------------
+404BBD2F1F4CC2FDEEF13AABDD523EF61F1C71F3  CN=*.badssl.com, OU… {Server Authentication, Client Authentication}
+339CDD57CFD5B141169B615FF31428782D1DA639  CN=COMODO RSA Domai… {Server Authentication, Client Authentication}
+AFE5D244A8D1194230FF479FE2F897BBCD7A8CB4  CN=COMODO RSA Certi…
 ```
 
 ## Links

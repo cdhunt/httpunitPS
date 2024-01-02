@@ -56,3 +56,34 @@ Each `[[plan]]` lists:
   [plan.headers]
   Server = "gws"
 ```
+
+### Test-SSLCertificate
+
+The SSLCertificate commands may be moved to a separate module in the future.
+
+- [Get-SSLCertificate](docs/Get-SSLCertificate.md) _Get the SSL Certificate for given host._
+- [Show-SSLCertificateUI](docs/Show-SSLCertificateUI.md) _Displays a dialog box with detailed information about the specified x509 certificate._
+- [Test-SSLCertificate](docs/Test-SSLCertificate.md) _Test the validitiy of a given certificate._
+
+```powershell
+PS > Get-SSLCertificate expired.badssl.com | Test-SSLCertificate -ErrorVariable validation
+False
+```
+
+Validation failures produces an error message.
+
+```text
+Test-SSLCertificate: Certificate failed chain validation:
+A required certificate is not within its validity period when verifying against the current system clock or the timestamp in the signed file.
+```
+
+Inspect the [certificate chain](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain) inside the ErrorRecord.
+
+```powershell
+PS > $validation.TargetObject.ChainElements.Certificate
+Thumbprint                                Subject              EnhancedKeyUsageList
+----------                                -------              --------------------
+404BBD2F1F4CC2FDEEF13AABDD523EF61F1C71F3  CN=*.badssl.com, OU… {Server Authentication, Client Authentication}
+339CDD57CFD5B141169B615FF31428782D1DA639  CN=COMODO RSA Domai… {Server Authentication, Client Authentication}
+AFE5D244A8D1194230FF479FE2F897BBCD7A8CB4  CN=COMODO RSA Certi…
+```
