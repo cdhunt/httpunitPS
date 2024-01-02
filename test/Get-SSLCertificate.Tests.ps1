@@ -17,12 +17,12 @@ Describe 'Get-SSLCertificate' {
 
     }
 
-    Context 'SslStreamVariable' {
-        BeforeEach {
+    Context 'OutSslStreamVariable' {
+        AfterEach {
             Remove-Variable -Name sslStreamValue -ErrorAction SilentlyContinue
         }
 
-        It "Sets SslStreamVariable" {
+        It "Sets OutSslStreamVariable" {
             $cert = Get-SSLCertificate -ComputerName 'google.com' -OutSslStreamVariable sslStreamValue
             $sslStreamvalue | Should -Not -BeNullOrEmpty
             $sslStreamvalue.CipherAlgorithm | Should -BeOfType 'Security.Authentication.CipherAlgorithmType'
