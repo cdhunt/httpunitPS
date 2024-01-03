@@ -1,6 +1,6 @@
 # Test-SSLCertificate
 
-Verifies the entire certificates chain from a certificate object or hostname.
+Verifies the entire chain for a given certificate object or hostname. The cmdlet returns a boolean. Certificate policy validation error details are written to the pipeline as errors so you can use normal PowerShell error handling.
 
 ## Parameters
 
@@ -10,14 +10,14 @@ Verifies the entire certificates chain from a certificate object or hostname.
 - `[Switch]` **RevocationMode** _The Revocation Mode to use in validation.
 NoCheck: No revocation check is performed on the certificate.
 Offline: A revocation check is made using a cached certificate revocation list (CRL).
-Online: A revocation check is made using an online certificate revocation list (CRL)._ 
+Online (Default): A revocation check is made using an online certificate revocation list (CRL)._ 
 
 ### Parameter Set 2
 
 - `[Switch]` **RevocationMode** _The Revocation Mode to use in validation.
 NoCheck: No revocation check is performed on the certificate.
 Offline: A revocation check is made using a cached certificate revocation list (CRL).
-Online: A revocation check is made using an online certificate revocation list (CRL)._ 
+Online (Default): A revocation check is made using an online certificate revocation list (CRL)._ 
 - `[String]` **ComputerName** _A hostname or Url of the server to retreive the certificate to test._ Mandatory
 - `[Int32]` **Port** _The port to connect to the remote server._ 
 
@@ -58,4 +58,4 @@ Run multiple tests and accumulate any failures in the variable `$testFailures`.
 ## Links
 
 - [Get-SSLCertificate](Get-SSLCertificate.md)
-- [https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain?view=net-8.0#remarks](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain?view=net-8.0#remarks)
+- [https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain)

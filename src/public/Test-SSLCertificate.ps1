@@ -3,14 +3,14 @@ function Test-SSLCertificate {
 .SYNOPSIS
     Test the validitiy of a given certificate.
 .DESCRIPTION
-    Verifies the entire certificates chain from a certificate object or hostname.
+    Verifies the entire chain for a given certificate object or hostname. The cmdlet returns a boolean. Certificate policy validation error details are written to the pipeline as errors so you can use normal PowerShell error handling.
 .PARAMETER Certificate
     An X509Certificate2 certificate object.
 .PARAMETER RevocationMode
     The Revocation Mode to use in validation.
     NoCheck: No revocation check is performed on the certificate.
     Offline: A revocation check is made using a cached certificate revocation list (CRL).
-    Online: A revocation check is made using an online certificate revocation list (CRL).
+    Online (Default): A revocation check is made using an online certificate revocation list (CRL).
 .PARAMETER ComputerName
     A hostname or Url of the server to retreive the certificate to test.
 .PARAMETER Port
@@ -20,7 +20,7 @@ function Test-SSLCertificate {
 .LINK
     Get-SSLCertificate
 .LINK
-    https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain?view=net-8.0#remarks
+    https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain
 .INPUTS
     String, X509Certificates
 .OUTPUTS
