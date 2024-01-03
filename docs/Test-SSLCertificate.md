@@ -28,7 +28,7 @@ Online: A revocation check is made using an online certificate revocation list (
 Test the validity of the google SSL Certificate.
 
 ```powershell
-Get-SSLCertificate google.com | Test-SSLCertificates
+Get-SSLCertificate google.com | Test-SSLCertificate
 True
 ```
 ### Example 2

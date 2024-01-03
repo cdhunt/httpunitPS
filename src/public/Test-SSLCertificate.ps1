@@ -26,7 +26,7 @@ function Test-SSLCertificate {
 .OUTPUTS
     Bool
 .EXAMPLE
-    Get-SSLCertificate google.com | Test-SSLCertificates
+    Get-SSLCertificate google.com | Test-SSLCertificate
     True
 
     Test the validity of the google SSL Certificate.

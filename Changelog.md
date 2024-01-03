@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.1
+
+- Improves support for batching in SSLCertificate commands
+
 ## v0.5
 
 - Adds SSLCertificate commands
