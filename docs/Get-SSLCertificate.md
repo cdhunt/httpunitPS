@@ -6,7 +6,7 @@ Open an SSL connection to the given host and read the presented server certifica
 
 ### Parameter Set 1
 
-- `[String]` **ComputerName** _A hostname or Url of the server to retreive the certificate._ Mandatory
+- `[String]` **ComputerName** _A hostname or Url of the server to retreive the certificate._ Mandatory, ValueFromPipeline
 - `[Int32]` **Port** _The port to connect to the remote server._ 
 - `[String]` **OutSslStreamVariable** _Stores SslStream connetion details from the command in the specified variable._ 
 

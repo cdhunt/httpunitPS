@@ -43,6 +43,10 @@ function Test-SSLCertificate {
     AFE5D244A8D1194230FF479FE2F897BBCD7A8CB4  CN=COMODO RSA Certi…
 
     Tests an invalid certificates and inspect the error in variable `$validation` for the certificate details.
+.EXAMPLE
+    @('expired.badssl.com', 'google.com', 'https://self-signed.badssl.com' | Get-SSLCertificate | Test-SSLCertificate -ErrorVariable +testFailures
+
+    Run multiple tests and accumulate any failures in the variable `$testFailures`.
 #>
     [CmdletBinding(DefaultParameterSetName = 'Certificate')]
     param (
@@ -78,7 +82,7 @@ function Test-SSLCertificate {
         $buildResult = $Chain.Build($Certificate)
 
         if (! $buildResult) {
-            $exception = [Exception]::new(("Certificate failed chain validation:{0}{1}" -f [System.Environment]::NewLine, ($Chain.ChainStatus.StatusInformation -join [System.Environment]::NewLine)))
+            $exception = [Exception]::new(("Certificate failed chain validation for '{0}'.{1}{2}" -f $Certificate.Host, [System.Environment]::NewLine, ($Chain.ChainStatus.StatusInformation -join [System.Environment]::NewLine)))
             Write-Error -Exception $exception -Category SecurityError -ErrorId 100 -TargetObject $Chain
         }
 

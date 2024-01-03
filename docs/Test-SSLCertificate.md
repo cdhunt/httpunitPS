@@ -47,6 +47,13 @@ Thumbprint                                Subject              EnhancedKeyUsageL
 339CDD57CFD5B141169B615FF31428782D1DA639  CN=COMODO RSA Domai… {Server Authentication, Client Authentication}
 AFE5D244A8D1194230FF479FE2F897BBCD7A8CB4  CN=COMODO RSA Certi…
 ```
+### Example 3
+
+Run multiple tests and accumulate any failures in the variable `$testFailures`.
+
+```powershell
+@('expired.badssl.com', 'google.com', 'https://self-signed.badssl.com' | Get-SSLCertificate | Test-SSLCertificate -ErrorVariable +testFailures
+```
 
 ## Links
 
