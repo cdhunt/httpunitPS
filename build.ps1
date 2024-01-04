@@ -128,7 +128,12 @@ function Test {
         Install-Module -Name Pester -Confirm:$false -Force
     }
 
-    Invoke-Pester -Path test -Output detailed
+    $config = [PesterConfiguration]::Default
+    $config.Run.Path = "test"
+    $config.TestResult.Enabled = $true
+    $config.TestResult.OutputFormat = "NUnitXml"
+    $config.Output.Verbosity = "Detailed"
+    Invoke-Pester -Configuration $config
 }
 
 

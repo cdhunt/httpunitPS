@@ -82,9 +82,16 @@ jobs:
           name: build
           path: publish
 
+      - uses: testspace-com/setup-testspace@v1
+        with:
+          domain: ${{github.repository_owner}}
+
       - name: Test
         shell: pwsh
         run: ./build.ps1 test
+
+      - name: Publish Results to Testspace
+        run: testspace "./*.xml"
 
   test5:
     permissions:
