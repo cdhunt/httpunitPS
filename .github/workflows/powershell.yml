@@ -97,7 +97,7 @@ jobs:
         run: ./build.ps1 test
 
       - name: Publish Results to Testspace
-        run: testspace "[v{{ matrix.pwshv }}]testResults.xml"
+        run: testspace "[v${{ matrix.pwshv }}]testResults.xml"
         if: always()
 
   test5:
@@ -118,9 +118,17 @@ jobs:
           name: build
           path: publish
 
+      - uses: testspace-com/setup-testspace@v1
+        with:
+          domain: ${{github.repository_owner}}
+
       - name: Test
         shell: powershell
         run: ./build.ps1 test
+
+      - name: Publish Results to Testspace
+        run: testspace "[v5.1]testResults.xml"
+        if: always()
 
   publish:
     permissions:
