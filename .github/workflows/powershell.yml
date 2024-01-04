@@ -82,6 +82,12 @@ jobs:
           name: build
           path: publish
 
+      - name: Install Curl
+        shell: pwsh
+        run: |
+          apt-get update
+          apt-get install curl -y
+
       - uses: testspace-com/setup-testspace@v1
         with:
           domain: ${{github.repository_owner}}

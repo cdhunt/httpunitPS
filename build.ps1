@@ -124,9 +124,7 @@ function Build {
 function Test {
     param ()
 
-    if ($null -eq (Get-Module Pester -ListAvailable)) {
-        Install-Module -Name Pester -Confirm:$false -Force
-    }
+    Install-Module -Name Pester -MinimumVersion 5.5.0 -Confirm:$false
 
     $config = [PesterConfiguration]::Default
     $config.Run.Path = "test"
