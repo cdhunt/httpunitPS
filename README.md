@@ -10,13 +10,16 @@ It also provides easy access to the Windows Certificate store for client certifi
 
 ## CI
 
-[![PowerShell](https://github.com/cdhunt/httpunitPS/actions/workflows/powershell.yml/badge.svg)](https://github.com/cdhunt/httpunitPS/actions/workflows/powershell.yml)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/httpunitps.svg?color=%235391FE&label=PowerShellGallery&logo=powershell&style=flat)](https://www.powershellgallery.com/packages/httpunitPS)
+
+![Build history](https://buildstats.info/github/chart/cdhunt/httpunitPS?branch=main)
+
 
 ## Install
 
-[powershellgallery.com/packages/httpunitPS](https://www.powershellgallery.com/packages/httpunitPS)
-
 `Install-Module -Name httpunitPS` or `Install-PSResource -Name httpunitPS`
+
+![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/httpunitps?color=%235391FE&style=flat)
 
 ## Docs
 
