@@ -11,7 +11,7 @@ It also provides easy access to the Windows Certificate store for client certifi
 ## CI
 
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/cdhunt/httpunitps/powershell.yml?style=flat&logo=github)
-[![Testspace pass ratio](https://img.shields.io/testspace/pass-ratio/cdhunt/cdhunt%3AhttpunitPS/main)](https://cdhunt.testspace.com/spaces/256126/current/381181)
+[![Testspace pass ratio](https://img.shields.io/testspace/pass-ratio/cdhunt/cdhunt%3AhttpunitPS/main)](https://cdhunt.testspace.com/projects/67973/spaces)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/httpunitps.svg?color=%235391FE&label=PowerShellGallery&logo=powershell&style=flat)](https://www.powershellgallery.com/packages/httpunitPS)
 
 ![Build history](https://buildstats.info/github/chart/cdhunt/httpunitPS?branch=main)
