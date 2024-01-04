@@ -97,7 +97,7 @@ jobs:
         run: ./build.ps1 test
 
       - name: Publish Results to Testspace
-        run: testspace "[v${{ matrix.pwshv }}]testResults.xml"
+        run: testspace "[v${{ matrix.pwshv }}]testResults.xml" "#Pester"
         if: always()
 
   test5:
@@ -127,7 +127,7 @@ jobs:
         run: ./build.ps1 test
 
       - name: Publish Results to Testspace
-        run: testspace "[v5.1]testResults.xml"
+        run: testspace "[v5.1]testResults.xml" "#Pester"
         if: always()
 
   publish:
