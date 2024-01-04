@@ -128,11 +128,15 @@ function Test {
         Install-Module -Name Pester -MinimumVersion 5.5.0 -Confirm:$false -Force
     }
 
-    $config = [PesterConfiguration]::Default
-    $config.Run.Path = "test"
-    $config.TestResult.Enabled = $true
-    $config.TestResult.OutputFormat = "NUnitXml"
-    $config.Output.Verbosity = "Detailed"
+    $config = New-PesterConfiguration -Hashtable @{
+        Run        = @{ Path = "test" }
+        TestResult = @{
+            Enabled      = $true
+            OutputFormat = "NUnitXml"
+        }
+        Output     = @{ Verbosity = "Detailed" }
+    }
+
     Invoke-Pester -Configuration $config
 }
 
