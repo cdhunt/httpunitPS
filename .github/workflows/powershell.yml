@@ -82,11 +82,11 @@ jobs:
           name: build
           path: publish
 
-      - name: Install Curl
+      - name: Install Utils
         shell: pwsh
         run: |
           apt-get update
-          apt-get install curl -y
+          apt-get install curl jq -y
 
       - uses: testspace-com/setup-testspace@v1
         with:
@@ -97,7 +97,8 @@ jobs:
         run: ./build.ps1 test
 
       - name: Publish Results to Testspace
-        run: testspace "[v${{ matrix.pwshv }}]testResults.xml" "#Pester"
+        run: testspace "[v${{ matrix.pwshv }}]testResults.xml"
+
         if: always()
 
   test5:
@@ -127,7 +128,7 @@ jobs:
         run: ./build.ps1 test
 
       - name: Publish Results to Testspace
-        run: testspace "[v5.1]testResults.xml" "#Pester"
+        run: testspace "[v5.1]testResults.xml"
         if: always()
 
   publish:
