@@ -179,6 +179,7 @@ function Invoke-HttpUnit {
                 'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
                 'tags' { $testPlan.Tags = $plan[$_] }
                 'headers' { $testPlan.Headers = $plan[$_] }
+                'ips' { $testPlan.IPs = $plan[$_] }
                 'certficate' {
                     $value = $plan[$_]
                     if ($value -like 'cert:\*') {
