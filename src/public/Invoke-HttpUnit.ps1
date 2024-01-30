@@ -23,7 +23,7 @@ function Invoke-HttpUnit {
 .PARAMETER Method
     For http/https, the HTTP method to send.
 .PARAMETER IPAddress
-    Provide one or more IPAddresses to target. Pass '*' to test all resolved addresses. Default is first resolved address.
+    Provide one or more IPAddresses to target. Pass `'*'` to test all resolved addresses. Default is first resolved address.
 .PARAMETER Quiet
     Do not output ErrorRecords for failed tests.
 .EXAMPLE
@@ -72,8 +72,7 @@ function Invoke-HttpUnit {
 
     Run all of the tests in a given config file.
 .NOTES
-    A $null Results property signifies no error and all specified
-    test criteria passed.
+    A `$null` Results property signifies no error and all specified test criteria passed.
 
     You can use the common variable -OutVariable to save the test results. Each TestResult object has a hidden Response property with the raw response from the server.
 .LINK

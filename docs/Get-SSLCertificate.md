@@ -67,3 +67,11 @@ SslProtocol          : Tls13
 
 - [Invoke-HttpUnit](Invoke-HttpUnit.md)
 - [Test-SSLCertificate](Test-SSLCertificate.md)
+
+## Notes
+
+No validation check done. This command will trust all certificates presented.
+
+## Outputs
+
+- `System.Security.Cryptography.X509Certificates.X509Certificate2`

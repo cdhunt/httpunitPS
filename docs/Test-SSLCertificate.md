@@ -59,3 +59,11 @@ Run multiple tests and accumulate any failures in the variable `$testFailures`.
 
 - [Get-SSLCertificate](Get-SSLCertificate.md)
 - [https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509chain)
+
+## Notes
+
+Test-SSLCertificate takes into consideration the status of each element in the chain.
+
+## Outputs
+
+- `Bool`
