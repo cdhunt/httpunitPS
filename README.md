@@ -40,7 +40,7 @@ Each `[[plan]]` lists:
 
 - `label =` A label for documentation purposes. It must be unique.
 - `url =` The URL to retrieve.
-- `ips =` For http/https, a list of IPs to send the URL to. Default is "use DNS". Otherwise the connection is made to the IP address listed, ignoring DNS. **_Not implemented_**
+- `ips =` For http/https, a list of IPs to send the URL to. Default is "use DNS". Otherwise the connection is made to the IP address listed, ignoring DNS. Pass `'*'` to test all resolved addresses.
 - `code =` For http/https, the expected status code, default 200.
 - `string =` For http/https, a string we expect to find in the result.
 - `regex =` For http/https, a regular expression we expect to match in the result. **_Not implemented_**
