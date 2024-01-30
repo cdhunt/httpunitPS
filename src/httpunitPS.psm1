@@ -204,7 +204,7 @@ class TestCase {
                 $result.InvalidCert = $true
             }
 
-            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $client)
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $content)
         } finally {
             $result.TimeTotal = (Get-Date) - $time
         }
