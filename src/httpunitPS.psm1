@@ -21,32 +21,50 @@ class TestPlan {
         $cases = [System.Collections.Generic.List[TestCase]]::new()
         $planUrl = [uri]$this.URL
 
-        <# WIP
+        $expandedIPList = @()
         if ($this.IPs.Count -gt 0) {
-            if ($this.IPs -contains '*') {
 
-                $resolved = Resolve-DnsName -Name $planUrl.Host | Select-Object -ExpandProperty IPAddress
+            $this.IPs | ForEach-Object {
+                if ($_ -eq '*') {
+                    $expandedIPList += Resolve-DnsName -Name $planUrl.DnsSafeHost -Type A | Select-Object -ExpandProperty IPAddress
+                } else {
+                    $ip = [ipaddress]'0.0.0.0'
+                    $isIp = [ipaddress]::TryParse($_, [ref]$ip)
+                    if ($isIp) {
+                        $expandedIPList += $ip.ToString()
+                    } else {
+                        Write-Warning "'$_' is not a valid IPAddress"
+                    }
+                }
             }
-        }
-        #>
-        $case = [TestCase]@{
-            URL        = $planUrl
-            Plan       = $this
-            ExpectCode = [System.Net.HttpStatusCode]$this.Code
+        } else {
+            $expandedIPList += Resolve-DnsName -Name $planUrl.DnsSafeHost -Type A | Select-Object -ExpandProperty IPAddress -First 1
         }
 
-        if (![string]::IsNullOrEmpty($this.Text)) {
-            Write-Debug ('Adding simple string matching test case. "{0}"' -f $this.Text)
-            $case.ExpectText = $this.Text
+        foreach ($item in $expandedIPList) {
+            $case = [TestCase]@{
+                URL        = $planUrl
+                IP         = $item
+                Plan       = $this
+                ExpectCode = [System.Net.HttpStatusCode]$this.Code
+            }
+
+            if (![string]::IsNullOrEmpty($this.Text)) {
+                Write-Debug ('Adding simple string matching test case. "{0}"' -f $this.Text)
+                $case.ExpectText = $this.Text
+            }
+
+            if ($null -ne $this.Headers) {
+                Write-Debug ('Adding headers test case. Checking for "{0}" headers' -f $this.Headers.Count)
+                $case.ExpectHeaders = $this.Headers
+            }
+
+
+            $cases.Add($case)
         }
 
-        if ($null -ne $this.Headers) {
-            Write-Debug ('Adding headers test case. Checking for "{0}" headers' -f $this.Headers.Count)
-            $case.ExpectHeaders = $this.Headers
-        }
 
 
-        $cases.Add($case)
 
         return $cases
     }
@@ -108,9 +126,9 @@ class TestCase {
         $client = [Net.Http.HttpClient]::new($handler)
         $client.DefaultRequestHeaders.Host = $this.URL.Host
         $client.Timeout = $this.Plan.Timeout
-        $content = [Net.Http.HttpRequestMessage]::new()
-        $content.RequestUri = $this.URL
-        $content.Method = [Net.Http.HttpMethod]$this.Plan.Method
+
+        $testUri = $this.URL.Scheme + '://' + $this.IP.ToString() + ':' + $this.URL.Port + $this.URL.PathAndQuery
+        $content = [Net.Http.HttpRequestMessage]::new($this.Plan.Method, $testUri)
 
         if ($this.Plan.InsecureSkipVerify) {
             Write-Debug ('TestHttp: ValidateSSL={0}' -f $this.Plan.InsecureSkipVerify)
