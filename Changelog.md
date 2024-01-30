@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.0
+
+- Adds IPs functionality
+
 ## v0.5.1
 
 - Improves support for batching in SSLCertificate commands
