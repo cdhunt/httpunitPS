@@ -78,6 +78,13 @@ Describe 'Invoke-HttpUnit' {
             $result.InvalidCert | Should -Be $False
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
+
+        It 'Should expand "*" in IPs' {
+            $result = Invoke-HttpUnit -Path "$PSScriptRoot/testconfig2.yaml" -Tag run-ips
+
+            $result.Count       | Should -BeGreaterThan 2
+            $result[0].Label       | Should -BeExactly "IPs"
+        }
     }
     Context 'By Value by Pipeline' {
         It 'Should return 200 for google' {
