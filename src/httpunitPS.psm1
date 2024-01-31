@@ -26,7 +26,7 @@ class TestPlan {
 
             $this.IPs | ForEach-Object {
                 if ($_ -eq '*') {
-                    $expandedIPList += [Net.Dns]::GetHostEntry($planUrl.DnsSafeHost, 'InterNetwork') | Select-Object -ExpandProperty AddressList
+                    $expandedIPList += [Net.Dns]::GetHostEntry($planUrl.DnsSafeHost, 'InterNetwork') | Select-Object -ExpandProperty AddressList | Select-Object -ExpandProperty IPAddressToString
                 } else {
                     $ip = [ipaddress]'0.0.0.0'
                     $isIp = [ipaddress]::TryParse($_, [ref]$ip)
@@ -38,7 +38,7 @@ class TestPlan {
                 }
             }
         } else {
-            $expandedIPList += [Net.Dns]::GetHostEntry($planUrl.DnsSafeHost, 'InterNetwork') | Select-Object -ExpandProperty AddressList -First 1
+            $expandedIPList += [Net.Dns]::GetHostEntry($planUrl.DnsSafeHost, 'InterNetwork') | Select-Object -ExpandProperty AddressList | Select-Object -ExpandProperty IPAddressToString -First 1
         }
 
         foreach ($item in $expandedIPList) {
