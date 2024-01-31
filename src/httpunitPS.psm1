@@ -17,16 +17,30 @@ class TestPlan {
     [X509Certificate] $ClientCertificate
     [timespan] $Timeout = [timespan]::new(0, 0, 3)
 
-    [System.Collections.Generic.List[TestCase]] Cases() {
-        $cases = [System.Collections.Generic.List[TestCase]]::new()
+    [string[]] ResolveIPs ([bool]$All) {
         $planUrl = [uri]$this.URL
+        $hostName = $planUrl.DnsSafeHost
 
+        $addressList = [Net.Dns]::GetHostEntry($hostName) |
+        Select-Object -ExpandProperty AddressList |
+        Where-Object AddressFamily -eq 'InterNetwork' |
+        Select-Object -ExpandProperty IPAddressToString
+
+        if (!$All) {
+            return $addressList | Select-Object -First 1
+        }
+
+        return $addressList
+    }
+
+    [string[]] ExpandIpList () {
         $expandedIPList = @()
+
         if ($this.IPs.Count -gt 0) {
 
             $this.IPs | ForEach-Object {
                 if ($_ -eq '*') {
-                    $expandedIPList += [Net.Dns]::GetHostEntry($planUrl.DnsSafeHost, 'InterNetwork') | Select-Object -ExpandProperty AddressList | Select-Object -ExpandProperty IPAddressToString
+                    $expandedIPList += $this.ResolveIPs($true)
                 } else {
                     $ip = [ipaddress]'0.0.0.0'
                     $isIp = [ipaddress]::TryParse($_, [ref]$ip)
@@ -38,10 +52,17 @@ class TestPlan {
                 }
             }
         } else {
-            $expandedIPList += [Net.Dns]::GetHostEntry($planUrl.DnsSafeHost, 'InterNetwork') | Select-Object -ExpandProperty AddressList | Select-Object -ExpandProperty IPAddressToString -First 1
+            $expandedIPList += $this.ResolveIPs($false)
         }
 
-        foreach ($item in $expandedIPList) {
+        return $expandedIPList
+    }
+
+    [System.Collections.Generic.List[TestCase]] Cases() {
+        $cases = [System.Collections.Generic.List[TestCase]]::new()
+        $planUrl = [uri]$this.URL
+
+        foreach ($item in $this.ExpandIpList()) {
             $case = [TestCase]@{
                 URL        = $planUrl
                 IP         = $item
