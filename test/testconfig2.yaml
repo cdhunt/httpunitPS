@@ -9,3 +9,9 @@ Plan:
   timeout: 0:0:10
   url: bad://www.google.com
   tags: [do-not-run]
+- label: IPs
+  timeout: 0:0:10
+  url: https://www.google.com
+  ips:
+  - '*'
+  tags: [run-ips]

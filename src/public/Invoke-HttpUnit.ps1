@@ -22,6 +22,8 @@ function Invoke-HttpUnit {
     For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate.
 .PARAMETER Method
     For http/https, the HTTP method to send.
+.PARAMETER IPAddress
+    Provide one or more IPAddresses to target. Pass `'*'` to test all resolved addresses. Default is first resolved address.
 .PARAMETER Quiet
     Do not output ErrorRecords for failed tests.
 .EXAMPLE
@@ -70,8 +72,7 @@ function Invoke-HttpUnit {
 
     Run all of the tests in a given config file.
 .NOTES
-    A $null Results property signifies no error and all specified
-    test criteria passed.
+    A `$null` Results property signifies no error and all specified test criteria passed.
 
     You can use the common variable -OutVariable to save the test results. Each TestResult object has a hidden Response property with the raw response from the server.
 .LINK
@@ -147,6 +148,12 @@ function Invoke-HttpUnit {
         [String]
         $Method,
 
+        [Parameter(Position = 7,
+            ParameterSetName = 'url',
+            ValueFromPipelineByPropertyName = $true)]
+        [String[]]
+        $IPAddress,
+
         [Parameter()]
         [Switch]
         $Quiet
@@ -172,12 +179,12 @@ function Invoke-HttpUnit {
                 'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
                 'tags' { $testPlan.Tags = $plan[$_] }
                 'headers' { $testPlan.Headers = $plan[$_] }
+                'ips' { $testPlan.IPs = $plan[$_] }
                 'certficate' {
                     $value = $plan[$_]
                     if ($value -like 'cert:\*') {
                         $testPlan.ClientCertificate = Get-Item $value
-                    }
-                    else {
+                    } else {
                         $testPlan.ClientCertificate = (Get-Item "Cert:\LocalMachine\My\$value")
                     }
                 }
@@ -202,8 +209,7 @@ function Invoke-HttpUnit {
                 $case.Test()
             }
         }
-    }
-    else {
+    } else {
         $plan = [TestPlan]::new()
         $plan.URL = $Url
 
@@ -214,6 +220,7 @@ function Invoke-HttpUnit {
             'Timeout' { $plan.Timeout = $Timeout }
             'Certificate' { $plan.ClientCertificate = $Certificate }
             'Method' { $plan.Method = $Method }
+            'IPAddress' { $plan.IPs = $IPAddress }
         }
 
         foreach ($case in $plan.Cases()) {

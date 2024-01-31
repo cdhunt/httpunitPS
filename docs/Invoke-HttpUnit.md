@@ -13,6 +13,7 @@ This is not a 100% accurate port of httpunit. The goal of this module is to util
 - `[TimeSpan]` **Timeout** _A timeout for the test. Default is 3 seconds._ 
 - `[X509Certificate]` **Certificate** _For http/https, specifies the client certificate that is used for a secure web request. Enter a variable that contains a certificate._ 
 - `[String]` **Method** _For http/https, the HTTP method to send._ 
+- `[String[]]` **IPAddress** _Provide one or more IPAddresses to target. Pass `'*'` to test all resolved addresses. Default is first resolved address._ 
 - `[Switch]` **Quiet** _Do not output ErrorRecords for failed tests._ 
 
 ### Parameter Set 2
@@ -78,3 +79,9 @@ TimeTotal   : 00:00:00.1021738
 
 - [https://github.com/StackExchange/httpunit](https://github.com/StackExchange/httpunit)
 - [https://github.com/cdhunt/Import-ConfigData](https://github.com/cdhunt/Import-ConfigData)
+
+## Notes
+
+A `$null` Results property signifies no error and all specified test criteria passed.
+
+You can use the common variable -OutVariable to save the test results. Each TestResult object has a hidden Response property with the raw response from the server.

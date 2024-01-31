@@ -26,3 +26,7 @@ Get-SSLCertificate google.com | Show-SSLCertificateUI
 ## Links
 
 - [Get-SSLCertificate](Get-SSLCertificate.md)
+
+## Notes
+
+PowerShell processing is blocked until the certificates dialg box is closed.

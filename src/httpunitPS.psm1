@@ -17,36 +17,75 @@ class TestPlan {
     [X509Certificate] $ClientCertificate
     [timespan] $Timeout = [timespan]::new(0, 0, 3)
 
+    [string[]] ResolveIPs ([bool]$All) {
+        $planUrl = [uri]$this.URL
+        $hostName = $planUrl.DnsSafeHost
+
+        $addressList = [Net.Dns]::GetHostEntry($hostName) |
+        Select-Object -ExpandProperty AddressList |
+        Where-Object AddressFamily -eq 'InterNetwork' |
+        Select-Object -ExpandProperty IPAddressToString
+
+        if (!$All) {
+            return $addressList | Select-Object -First 1
+        }
+
+        return $addressList
+    }
+
+    [string[]] ExpandIpList () {
+        $expandedIPList = @()
+
+        if ($this.IPs.Count -gt 0) {
+
+            $this.IPs | ForEach-Object {
+                if ($_ -eq '*') {
+                    $expandedIPList += $this.ResolveIPs($true)
+                } else {
+                    $ip = [ipaddress]'0.0.0.0'
+                    $isIp = [ipaddress]::TryParse($_, [ref]$ip)
+                    if ($isIp) {
+                        $expandedIPList += $ip.ToString()
+                    } else {
+                        Write-Warning "'$_' is not a valid IPAddress"
+                    }
+                }
+            }
+        } else {
+            $expandedIPList += $this.ResolveIPs($false)
+        }
+
+        return $expandedIPList
+    }
+
     [System.Collections.Generic.List[TestCase]] Cases() {
         $cases = [System.Collections.Generic.List[TestCase]]::new()
         $planUrl = [uri]$this.URL
 
-        <# WIP
-        if ($this.IPs.Count -gt 0) {
-            if ($this.IPs -contains '*') {
-
-                $resolved = Resolve-DnsName -Name $planUrl.Host | Select-Object -ExpandProperty IPAddress
+        foreach ($item in $this.ExpandIpList()) {
+            $case = [TestCase]@{
+                URL        = $planUrl
+                IP         = $item
+                Plan       = $this
+                ExpectCode = [System.Net.HttpStatusCode]$this.Code
             }
-        }
-        #>
-        $case = [TestCase]@{
-            URL        = $planUrl
-            Plan       = $this
-            ExpectCode = [System.Net.HttpStatusCode]$this.Code
-        }
 
-        if (![string]::IsNullOrEmpty($this.Text)) {
-            Write-Debug ('Adding simple string matching test case. "{0}"' -f $this.Text)
-            $case.ExpectText = $this.Text
-        }
+            if (![string]::IsNullOrEmpty($this.Text)) {
+                Write-Debug ('Adding simple string matching test case. "{0}"' -f $this.Text)
+                $case.ExpectText = $this.Text
+            }
 
-        if ($null -ne $this.Headers) {
-            Write-Debug ('Adding headers test case. Checking for "{0}" headers' -f $this.Headers.Count)
-            $case.ExpectHeaders = $this.Headers
+            if ($null -ne $this.Headers) {
+                Write-Debug ('Adding headers test case. Checking for "{0}" headers' -f $this.Headers.Count)
+                $case.ExpectHeaders = $this.Headers
+            }
+
+
+            $cases.Add($case)
         }
 
 
-        $cases.Add($case)
+
 
         return $cases
     }
@@ -108,9 +147,10 @@ class TestCase {
         $client = [Net.Http.HttpClient]::new($handler)
         $client.DefaultRequestHeaders.Host = $this.URL.Host
         $client.Timeout = $this.Plan.Timeout
-        $content = [Net.Http.HttpRequestMessage]::new()
-        $content.RequestUri = $this.URL
-        $content.Method = [Net.Http.HttpMethod]$this.Plan.Method
+
+
+        $testUri = $this.URL.OriginalString -replace $this.URL.Host, $this.IP.ToString()
+        $content = [Net.Http.HttpRequestMessage]::new($this.Plan.Method, [Uri]$testUri)
 
         if ($this.Plan.InsecureSkipVerify) {
             Write-Debug ('TestHttp: ValidateSSL={0}' -f $this.Plan.InsecureSkipVerify)
@@ -186,7 +226,7 @@ class TestCase {
                 $result.InvalidCert = $true
             }
 
-            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $client)
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $content)
         } finally {
             $result.TimeTotal = (Get-Date) - $time
         }
