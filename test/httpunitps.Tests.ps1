@@ -82,8 +82,10 @@ Describe 'Invoke-HttpUnit' {
         It 'Should expand "*" in IPs' {
             $result = Invoke-HttpUnit -Path "$PSScriptRoot/testconfig2.yaml" -Tag run-ips
 
-            $result.Count       | Should -BeGreaterThan 2
+            $result.Count       | Should -BeGreaterThan 0
             $result[0].Label       | Should -BeExactly "IPs"
+            $result[0].response.RequestMessage.RequestUri.OriginalString | Should -Not -Be 'https://*'
+            $result[0].response.RequestMessage.Headers.Host | Should -Be 'www.google.com'
         }
     }
     Context 'By Value by Pipeline' {
