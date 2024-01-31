@@ -127,7 +127,11 @@ class TestCase {
         $client.DefaultRequestHeaders.Host = $this.URL.Host
         $client.Timeout = $this.Plan.Timeout
 
-        $testUri = $this.URL.Scheme + '://' + $this.IP.ToString() + ':' + $this.URL.Port + $this.URL.PathAndQuery
+        $p = [string]::Empty
+        if ($null -ne $this.URL.Port ) {
+            $p = ':' + $this.URL.Port
+        }
+        $testUri = $this.URL.Scheme + '://' + $this.IP.ToString() + $p + $this.URL.PathAndQuery
         $content = [Net.Http.HttpRequestMessage]::new($this.Plan.Method, $testUri)
 
         if ($this.Plan.InsecureSkipVerify) {
