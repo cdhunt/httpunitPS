@@ -129,7 +129,7 @@ class TestCase {
 
 
         $testUri = $this.URL.OriginalString -replace $this.URL.Host, $this.IP.ToString()
-        $content = [Net.Http.HttpRequestMessage]::new($this.Plan.Method, $testUri)
+        $content = [Net.Http.HttpRequestMessage]::new($this.Plan.Method, [Uri]$testUri)
 
         if ($this.Plan.InsecureSkipVerify) {
             Write-Debug ('TestHttp: ValidateSSL={0}' -f $this.Plan.InsecureSkipVerify)
