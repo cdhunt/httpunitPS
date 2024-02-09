@@ -30,6 +30,7 @@ Describe 'Invoke-HttpUnit' {
             $result.GotRegex    | Should -Be $False
             $result.GotHeaders  | Should -Be $False
             $result.InvalidCert | Should -Be $False
+            $result.ServerCertificate.Subject | Should -Be 'CN=www.example.org, O=Internet Corporation for Assigned Names and Numbers, L=Los Angeles, S=California, C=US'
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
 
@@ -41,10 +42,10 @@ Describe 'Invoke-HttpUnit' {
             $result.InvalidCert | Should -Be $true
             if ($PSVersionTable.PSVersion -ge [version]"7.3") {
                 $result.Result.Exception.Message | Should -Be 'The remote certificate is invalid because of errors in the certificate chain: NotTimeValid'
-            }
-            else {
+            } else {
                 $result.Result.Exception.Message | Should -Be 'The remote certificate is invalid according to the validation procedure.'
             }
+            $result.ServerCertificate.Subject | Should -Be 'CN=*.badssl.com, OU=PositiveSSL Wildcard, OU=Domain Control Validated'
         }
     }
     Context 'By Config' {

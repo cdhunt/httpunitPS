@@ -229,6 +229,10 @@ class TestCase {
             $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception.GetBaseException(), "5", "ConnectionError", $content)
         } finally {
             $result.TimeTotal = (Get-Date) - $time
+
+            if ($this.URL.Scheme -eq 'https') {
+                $result.ServerCertificate = Get-SSLCertificate -ComputerName $this.URL.DnsSafeHost -Port $this.URL.Port
+            }
         }
 
         return $result
@@ -246,6 +250,7 @@ class TestResult {
     [bool] $GotRegex
     [bool] $GotHeaders
     [bool] $InvalidCert
+    [Security.Cryptography.X509Certificates.X509Certificate2] $ServerCertificate
     [timespan] $TimeTotal
 
     TestResult () {}
