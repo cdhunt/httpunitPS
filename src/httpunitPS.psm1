@@ -238,7 +238,7 @@ class TestCase {
 class TestResult {
     [string] $Label
     [System.Management.Automation.ErrorRecord] $Result
-    hidden [object] $Response
+    [object] $Response
 
     [bool] $Connected
     [bool] $GotCode
