@@ -57,6 +57,6 @@ redirect (10.99.88.77)   OperationTimeout False     False   False   False      F
 
 A `$null` Results property signifies no error and all specified test criteria passed.
 
-You can use the common variable -OutVariable to save the test results.
+You can use the common variable _OutVariable_ to save the test results.
 Each TestResult object has a Response property with the raw response from the server.
-For HTTPS tests, the TestResult object will have the ServerCertificate populated with the server certificate.
+For HTTPS tests, the TestResult object will have the ServerCertificate populated with the certificate presented by the server.
