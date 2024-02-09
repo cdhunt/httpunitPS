@@ -135,15 +135,21 @@ class TestCase {
 
         $result.Label = '{0} ({1})' -f $result.Label, $testName
 
-        $testOutput = Test-NetConnection -ComputerName $testName -Port $testPort
+        if ([System.Environment]::OSVersion.Platform.ToString() -eq 'Win32NT') {
+            $testOutput = Test-NetConnection -ComputerName $testName -Port $testPort
 
-        if (!$testOutput.TcpTestSucceeded) {
-            $result.Connected = $false
-            $exception = [Exception]::new(("TCP connect to ({0} : {1}) failed" -f $testName, $testPort ))
-            $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "10", "ConnectionError", $this.URL)
+
+            if (!$testOutput.TcpTestSucceeded) {
+                $result.Connected = $false
+                $exception = [Exception]::new(("TCP connect to ({0} : {1}) failed" -f $testName, $testPort ))
+                $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "10", "ConnectionError", $this.URL)
+            }
+
+            $result.Response = $testOutput
+        } else {
+            $exception = [Exception]::new(("Not yet implemented on this platform" ))
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "100", "NotImplemented", $this.URL)
         }
-
-        $result.Response = $testOutput
         $result.TimeTotal = (Get-Date) - $time
         return $result
     }

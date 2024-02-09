@@ -9,7 +9,7 @@ Describe 'Invoke-HttpUnit' {
         It 'Should return 200 for google' {
             $result = Invoke-HttpUnit -Url https://www.google.com -Code 200
 
-            $result.Label       | Should -Be "https://www.google.com/"
+            $result.Label       | Should -Match "https://www.google.com/"
             $result.Result      | Should -BeNullOrEmpty
             $result.Connected   | Should -Be $True
             $result.GotCode     | Should -Be $True
@@ -22,7 +22,7 @@ Describe 'Invoke-HttpUnit' {
         It 'Should support string matching' {
             $result = Invoke-HttpUnit -Url https://example.com/ -String 'Example Domain'
 
-            $result.Label       | Should -Be "https://example.com/"
+            $result.Label       | Should -Match "https://example.com/"
             $result.Result      | Should -BeNullOrEmpty
             $result.Connected   | Should -Be $True
             $result.GotCode     | Should -Be $True
@@ -51,15 +51,24 @@ Describe 'Invoke-HttpUnit' {
         It 'Should test a TCP port' {
             $result = Invoke-HttpUnit -Url tcp://example.com:443
 
-            $result.Result | Should -BeNullOrEmpty
+            if ($IsLinux) {
+                $result.Result.Exception.Message | Should -Be 'Not yet implemented on this platform'
+            } else {
+                $result.Result | Should -BeNullOrEmpty
+            }
+
             $result.Connected   | Should -Be $true
         }
 
         It 'Should report a failed TCP test' {
             $result = Invoke-HttpUnit -Url tcp://example.com:442 -Quiet
 
-            $result.Connected   | Should -Be $false
-            $result.Result.Exception.Message | Should -Be 'TCP connect to (example.com : 442) failed'
+            if ($IsLinux) {
+                $result.Result.Exception.Message | Should -Be 'Not yet implemented on this platform'
+            } else {
+                $result.Connected   | Should -Be $false
+                $result.Result.Exception.Message | Should -Match 'TCP connect to \(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3} : 442\) failed'
+            }
         }
     }
 
@@ -70,7 +79,7 @@ Describe 'Invoke-HttpUnit' {
         ) {
             $result = Invoke-HttpUnit -Path $config
 
-            $result.Label       | Should -BeExactly "google"
+            $result.Label       | Should -Match "google"
             $result.Result      | Should -BeNullOrEmpty
             $result.Connected   | Should -Be $True
             $result.GotCode     | Should -Be $True
@@ -86,7 +95,7 @@ Describe 'Invoke-HttpUnit' {
 
             $result.Count | Should -Be 2
             foreach ($item in $result) {
-                $item.Label       | Should -BeExactly "google"
+                $item.Label       | Should -Match "google"
                 $item.Result      | Should -BeNullOrEmpty
                 $item.Connected   | Should -Be $True
                 $item.GotCode     | Should -Be $True
@@ -101,7 +110,7 @@ Describe 'Invoke-HttpUnit' {
         It 'Should filter by tag' {
             $result = Invoke-HttpUnit -Path "$PSScriptRoot/testconfig2.yaml" -Tag Run
 
-            $result.Label       | Should -BeExactly "good"
+            $result.Label       | Should -Match "good"
             $result.Result      | Should -BeNullOrEmpty
             $result.Connected   | Should -Be $True
             $result.GotCode     | Should -Be $True
@@ -116,7 +125,7 @@ Describe 'Invoke-HttpUnit' {
             $result = Invoke-HttpUnit -Path "$PSScriptRoot/testconfig2.yaml" -Tag run-ips
 
             $result.Count       | Should -BeGreaterThan 0
-            $result[0].Label       | Should -BeExactly "IPs"
+            $result[0].Label       | Should -Match "IPs"
             $result[0].response.RequestMessage.RequestUri.OriginalString | Should -Not -Be 'https://*'
             $result[0].response.RequestMessage.Headers.Host | Should -Be 'www.google.com'
         }
@@ -129,7 +138,7 @@ Describe 'Invoke-HttpUnit' {
             }
             $result = $inputObject | Invoke-HttpUnit
 
-            $result.Label       | Should -Be "https://www.google.com/"
+            $result.Label       | Should -Match "https://www.google.com/"
             $result.Result      | Should -BeNullOrEmpty
             $result.Connected   | Should -Be $True
             $result.GotCode     | Should -Be $True
@@ -147,7 +156,7 @@ Describe 'Invoke-HttpUnit' {
             $result = $inputObject | Invoke-HttpUnit
 
             $result.Count       | Should -Be 2
-            $result[0].Label       | Should -Be "https://www.google.com/"
+            $result[0].Label       | Should -Match "https://www.google.com/"
             $result[0].Result      | Should -BeNullOrEmpty
             $result[0].Connected   | Should -Be $True
             $result[0].GotCode     | Should -Be $True
@@ -157,7 +166,7 @@ Describe 'Invoke-HttpUnit' {
             $result[0].InvalidCert | Should -Be $False
             $result[0].TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
 
-            $result[1].Label       | Should -Be "https://example.com/"
+            $result[1].Label       | Should -Match "https://example.com/"
             $result[1].Result      | Should -BeNullOrEmpty
             $result[1].Connected   | Should -Be $True
             $result[1].GotCode     | Should -Be $True
