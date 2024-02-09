@@ -49,7 +49,7 @@ Describe 'Invoke-HttpUnit' {
         }
 
         It 'Should test a TCP port' {
-            $result = Invoke-HttpUnit -Url tcp://example.com:443
+            $result = Invoke-HttpUnit -Url tcp://example.com:443 -Quiet
 
             if ($IsLinux) {
                 $result.Result.Exception.Message | Should -Be 'Not yet implemented on this platform'
