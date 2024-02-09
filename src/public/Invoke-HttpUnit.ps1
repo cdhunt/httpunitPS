@@ -92,7 +92,7 @@ function Invoke-HttpUnit {
             HelpMessage = "Path to one or more locations.")]
         [Alias('PSPath')]
         [ValidateNotNullOrEmpty()]
-        [string]
+        [string[]]
         $Path,
 
         [Parameter(Position = 1,
@@ -159,76 +159,81 @@ function Invoke-HttpUnit {
         $Quiet
     )
 
-    if ($PSBoundParameters.ContainsKey('Path')) {
-        Write-Debug "Running checks defined in '$Path'"
+    process {
+
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            foreach ($p in $Path) {
+                Write-Debug "Running checks defined in '$p'"
 
 
-        $configObject = Import-ConfigData -Path $Path
+                $configObject = Import-ConfigData -Path $p
 
-        foreach ($plan in $configObject['plan']) {
-            $testPlan = [TestPlan]@{
-                Label = $plan['label']
-            }
+                foreach ($plan in $configObject['plan']) {
+                    $testPlan = [TestPlan]@{
+                        Label = $plan['label']
+                    }
 
-            switch ($plan.Keys) {
-                'label' { $testPlan.Label = $plan[$_] }
-                'url' { $testPlan.Url = $plan[$_] }
-                'method' { $testPlan.Method = $plan[$_] }
-                'code' { $testPlan.Code = $plan[$_] }
-                'string' { $testPlan.Text = $plan[$_] }
-                'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
-                'tags' { $testPlan.Tags = $plan[$_] }
-                'headers' { $testPlan.Headers = $plan[$_] }
-                'ips' { $testPlan.IPs = $plan[$_] }
-                'certificate' {
-                    $value = $plan[$_]
-                    if ($value -like 'cert:\*') {
-                        $testPlan.ClientCertificate = Get-Item $value
-                    } else {
-                        $testPlan.ClientCertificate = (Get-Item "Cert:\LocalMachine\My\$value")
+                    switch ($plan.Keys) {
+                        'label' { $testPlan.Label = $plan[$_] }
+                        'url' { $testPlan.Url = $plan[$_] }
+                        'method' { $testPlan.Method = $plan[$_] }
+                        'code' { $testPlan.Code = $plan[$_] }
+                        'string' { $testPlan.Text = $plan[$_] }
+                        'timeout' { $testPlan.Timeout = [timespan]$plan[$_] }
+                        'tags' { $testPlan.Tags = $plan[$_] }
+                        'headers' { $testPlan.Headers = $plan[$_] }
+                        'ips' { $testPlan.IPs = $plan[$_] }
+                        'certificate' {
+                            $value = $plan[$_]
+                            if ($value -like 'cert:\*') {
+                                $testPlan.ClientCertificate = Get-Item $value
+                            } else {
+                                $testPlan.ClientCertificate = (Get-Item "Cert:\LocalMachine\My\$value")
+                            }
+                        }
+                        'insecureSkipVerify' { $testPlan.InsecureSkipVerify = $plan[$_] }
+                    }
+
+                    # Filter tests
+                    if ($PSBoundParameters.ContainsKey('Tag')) {
+                        $found = $false
+                        foreach ($t in $Tag) {
+                            if ($testPlan.Tags -contains $t) { $found = $true }
+                        }
+                        if (!$found) {
+                            $testTags = $testPlan.Tags -join ', '
+                            $filterTags = $Tag -join ', '
+                            Write-Debug "Specified tags ($filterTags) do not match defined tags ($testTags)"
+                            Continue
+                        }
+                    }
+
+                    foreach ($case in $testPlan.Cases()) {
+                        $case.Test()
                     }
                 }
-                'insecureSkipVerify' { $testPlan.InsecureSkipVerify = $plan[$_] }
+            }
+        } else {
+            $plan = [TestPlan]::new()
+            $plan.URL = $Url
+
+            switch ($PSBoundParameters.Keys) {
+                'Code' { $plan.Code = $Code }
+                'String' { $plan.Text = $String }
+                'Headers' { $plan.Headers = $Headers }
+                'Timeout' { $plan.Timeout = $Timeout }
+                'Certificate' { $plan.ClientCertificate = $Certificate }
+                'Method' { $plan.Method = $Method }
+                'IPAddress' { $plan.IPs = $IPAddress }
             }
 
-            # Filter tests
-            if ($PSBoundParameters.ContainsKey('Tag')) {
-                $found = $false
-                foreach ($t in $Tag) {
-                    if ($testPlan.Tags -contains $t) { $found = $true }
+            foreach ($case in $plan.Cases()) {
+                $result = $case.Test()
+
+                Write-Output $result
+                if ($null -ne $result.Result -and !$Quiet) {
+                    Write-Error -ErrorRecord $result.Result
                 }
-                if (!$found) {
-                    $testTags = $testPlan.Tags -join ', '
-                    $filterTags = $Tag -join ', '
-                    Write-Debug "Specified tags ($filterTags) do not match defined tags ($testTags)"
-                    Continue
-                }
-            }
-
-            foreach ($case in $testPlan.Cases()) {
-                $case.Test()
-            }
-        }
-    } else {
-        $plan = [TestPlan]::new()
-        $plan.URL = $Url
-
-        switch ($PSBoundParameters.Keys) {
-            'Code' { $plan.Code = $Code }
-            'String' { $plan.Text = $String }
-            'Headers' { $plan.Headers = $Headers }
-            'Timeout' { $plan.Timeout = $Timeout }
-            'Certificate' { $plan.ClientCertificate = $Certificate }
-            'Method' { $plan.Method = $Method }
-            'IPAddress' { $plan.IPs = $IPAddress }
-        }
-
-        foreach ($case in $plan.Cases()) {
-            $result = $case.Test()
-
-            Write-Output $result
-            if ($null -ne $result.Result -and !$Quiet) {
-                Write-Error -ErrorRecord $result.Result
             }
         }
     }

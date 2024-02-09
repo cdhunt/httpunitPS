@@ -65,6 +65,23 @@ Describe 'Invoke-HttpUnit' {
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
 
+        It 'Should run for each config by pipeline' {
+            $result = Get-ChildItem -Path "$PSScriptRoot/testconfig1.*" | Invoke-HttpUnit
+
+            $result.Count | Should -Be 2
+            foreach ($item in $result) {
+                $item.Label       | Should -BeExactly "google"
+                $item.Result      | Should -BeNullOrEmpty
+                $item.Connected   | Should -Be $True
+                $item.GotCode     | Should -Be $True
+                $item.GotText     | Should -Be $False
+                $item.GotRegex    | Should -Be $False
+                $item.GotHeaders  | Should -Be $true
+                $item.InvalidCert | Should -Be $False
+                $item.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
+            }
+        }
+
         It 'Should filter by tag' {
             $result = Invoke-HttpUnit -Path "$PSScriptRoot/testconfig2.yaml" -Tag Run
 
@@ -105,6 +122,34 @@ Describe 'Invoke-HttpUnit' {
             $result.GotHeaders  | Should -Be $False
             $result.InvalidCert | Should -Be $False
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
+        }
+    }
+
+    Context 'By Value by Pipeline from CSV' {
+        It 'Should return 2 results' {
+            $inputObject = Import-Csv -Path "$PSScriptRoot/testpipelinevalue.csv"
+            $result = $inputObject | Invoke-HttpUnit
+
+            $result.Count       | Should -Be 2
+            $result[0].Label       | Should -Be "https://www.google.com/"
+            $result[0].Result      | Should -BeNullOrEmpty
+            $result[0].Connected   | Should -Be $True
+            $result[0].GotCode     | Should -Be $True
+            $result[0].GotText     | Should -Be $False
+            $result[0].GotRegex    | Should -Be $False
+            $result[0].GotHeaders  | Should -Be $False
+            $result[0].InvalidCert | Should -Be $False
+            $result[0].TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
+
+            $result[1].Label       | Should -Be "https://example.com/"
+            $result[1].Result      | Should -BeNullOrEmpty
+            $result[1].Connected   | Should -Be $True
+            $result[1].GotCode     | Should -Be $True
+            $result[1].GotText     | Should -Be $False
+            $result[1].GotRegex    | Should -Be $False
+            $result[1].GotHeaders  | Should -Be $False
+            $result[1].InvalidCert | Should -Be $False
+            $result[1].TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
     }
 }
