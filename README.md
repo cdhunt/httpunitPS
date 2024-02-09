@@ -27,30 +27,24 @@ It also provides easy access to the Windows Certificate store for client certifi
 
 [Full Docs](docs)
 
-### TOML
+### Config File
 
-This configuration file is targeting compatibility with the original [httpunit file format](https://github.com/StackExchange/httpunit/tree/master#toml) but is partially implemented.
+[TOML](https://github.com/toml-lang/toml), YAML, JSON, and PSD1 formats are supported for the config file.
 
-The [toml file](https://github.com/toml-lang/toml) has two sections:
+Each `plan` can have:
 
-- `Plan` is a list of test plans.
-- `IPs` are a table of search and replace regexes. **_Not implemented_**
+- `label` A label for documentation purposes.
+- `url` The URL to retrieve.
+- `ips` For http/https, a list of IPs to send the URL to. Default is "use DNS". Otherwise the connection is made to the IP address listed, ignoring DNS. Pass `'*'` to test all resolved addresses.
+- `code` For http/https, the expected status code, default 200.
+- `string` For http/https, a string we expect to find in the result.
+- `timeout` An optional timeout for the test in the format `"hh:mm:ss"`. Default is 3 seconds.
+- `certificate` For http/https, a path to a certificate in the Windows Store to pass as a Client Certificate. If just a Thumbprint is provided, it will look in `cert:\LocalMachine\My`.
+- `tags` An optional list of tags for the test. Used for when you want to only run a subset of tests with the `-tags` flag.
+- `insecureSkipVerify` Will allow testing of untrusted or self-signed certificates.
+- `plan.headers` For http/https, a list of keys and values to validate the response headers.
 
-Each `[[plan]]` lists:
-
-- `label =` A label for documentation purposes. It must be unique.
-- `url =` The URL to retrieve.
-- `ips =` For http/https, a list of IPs to send the URL to. Default is "use DNS". Otherwise the connection is made to the IP address listed, ignoring DNS. Pass `'*'` to test all resolved addresses.
-- `code =` For http/https, the expected status code, default 200.
-- `string =` For http/https, a string we expect to find in the result.
-- `regex =` For http/https, a regular expression we expect to match in the result. **_Not implemented_**
-- `timeout =` An optional timeout for the test in the format `"hh:mm:ss"`. Default is 3 seconds.
-- `certificate =` For http/https, a path to a certificate in the Windows Store to pass as a Client Certificate. If just a Thumbprint is provided, it will look in `cert:\LocalMachine\My`.
-- `tags =` An optional set of tags for the test. Used for when you want to only run a subset of tests with the `-tags` flag **_Not implemented_**
-- `insecureSkipVerify = true` Will allow testing of untrusted or self-signed certificates.
-- `[plan.headers]` For http/https, a list of keys and values to validate the response headers.
-
-#### A sample config file
+#### A sample TOML config file
 
 ```toml
 [[plan]]
@@ -60,6 +54,17 @@ Each `[[plan]]` lists:
   timeout = "0:0:10"
   [plan.headers]
   Server = "gws"
+```
+
+#### A sample YAML config file
+
+```yaml
+Plan:
+- code: 200
+  label: google
+  timeout: "0:0:10"
+  url: https://www.google.com
+  tags: [run]
 ```
 
 ### Test-SSLCertificate

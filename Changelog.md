@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.0
+
+- Fix: `certficate` typo in config parser.
+- Improvement: Invoke-HttpUnit pipeline input.
+- Feature: Add ServerCertificate property to the TestResult object.
+- Feature: Add TCP connection test.
+- Feature: Add a type format file for `TestResult`
+
 ## v0.6.0
 
 - Adds IPs functionality

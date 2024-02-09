@@ -68,6 +68,7 @@ $manifest = @{
     CmdletsToExport      = ''
     VariablesToExport    = ''
     AliasesToExport      = @('httpunit', 'Test-Http', 'ihu')
+    FormatsToProcess     = 'httpunitPS.format.ps1xml'
 }
 
 function Clean {
@@ -95,6 +96,7 @@ function Build {
     New-Item -Path $publish -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
 
     Copy-Item -Path "$src/$module.psm1" -Destination $publish
+    Copy-Item -Path "$src/$module.format.ps1xml" -Destination $publish
     Copy-Item -Path @("$parent/LICENSE", "$parent/README.md") -Destination $publish -ErrorAction SilentlyContinue
 
     $publicFunctions = Get-ChildItem -Path "$src/public/*.ps1"

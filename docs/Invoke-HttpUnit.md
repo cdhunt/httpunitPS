@@ -18,7 +18,7 @@ This is not a 100% accurate port of httpunit. The goal of this module is to util
 
 ### Parameter Set 2
 
-- `[String]` **Path** _Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1._ Mandatory, ValueFromPipeline
+- `[String[]]` **Path** _Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, json, and .psd1._ Mandatory, ValueFromPipeline
 - `[String[]]` **Tag** _If specified, only runs plans that are tagged with one of the tags specified._ 
 - `[Switch]` **Quiet** _Do not output ErrorRecords for failed tests._ 
 
@@ -30,15 +30,9 @@ Run an ad-hoc test against one Url.
 
 ```powershell
 Invoke-HttpUnit -Url https://www.google.com -Code 200
-Label       : https://www.google.com/
-Result      :
-Connected   : True
-GotCode     : True
-GotText     : False
-GotRegex    : False
-GotHeaders  : False
-InvalidCert : False
-TimeTotal   : 00:00:00.4695217
+Label                                     Result Connected GotCode GotText GotHeaders InvalidCert TimeTotal
+-----                                     ------ --------- ------- ------- ---------- ----------- ---------
+https://www.google.com/ (142.250.190.132)        True      True    False   False      False       00:00:00.2840173
 ```
 ### Example 2
 
@@ -46,33 +40,12 @@ Run all of the tests in a given config file.
 
 ```powershell
 Invoke-HttpUnit -Path .\example.toml
-Label       : google
-Result      :
-Connected   : True
-GotCode     : True
-GotText     : False
-GotRegex    : False
-GotHeaders  : False
-InvalidCert : False
-TimeTotal   : 00:00:00.3210709
-Label       : api
-Result      : Exception calling "GetResult" with "0" argument(s): "No such host is known. (api.example.com:80)"
-Connected   : False
-GotCode     : False
-GotText     : False
-GotRegex    : False
-GotHeaders  : False
-InvalidCert : False
-TimeTotal   : 00:00:00.0280893
-Label       : redirect
-Result      : Unexpected status code: NotFound
-Connected   : True
-GotCode     : False
-GotText     : False
-GotRegex    : False
-GotHeaders  : False
-InvalidCert : False
-TimeTotal   : 00:00:00.1021738
+Label                    Result           Connected GotCode GotText GotHeaders InvalidCert TimeTotal
+-----                    ------           --------- ------- ------- ---------- ----------- ---------
+google (142.250.190.132)                  True      True    False   False      False       00:00:00.2064638
+redirect (93.184.216.34) InvalidResult    True      False   False   False      False       00:00:00.0953043
+redirect (10.11.22.33)   OperationTimeout False     False   False   False      False       00:00:03.0100917
+redirect (10.99.88.77)   OperationTimeout False     False   False   False      False       00:00:03.0067049
 ```
 
 ## Links
@@ -84,4 +57,6 @@ TimeTotal   : 00:00:00.1021738
 
 A `$null` Results property signifies no error and all specified test criteria passed.
 
-You can use the common variable -OutVariable to save the test results. Each TestResult object has a hidden Response property with the raw response from the server.
+You can use the common variable _OutVariable_ to save the test results.
+Each TestResult object has a Response property with the raw response from the server.
+For HTTPS tests, the TestResult object will have the ServerCertificate populated with the certificate presented by the server.
