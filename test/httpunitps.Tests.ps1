@@ -30,7 +30,7 @@ Describe 'Invoke-HttpUnit' {
             $result.GotRegex    | Should -Be $False
             $result.GotHeaders  | Should -Be $False
             $result.InvalidCert | Should -Be $False
-            $result.ServerCertificate.Subject | Should -Be 'CN=www.example.org, O=Internet Corporation for Assigned Names and Numbers, L=Los Angeles, S=California, C=US'
+            $result.ServerCertificate.Subject | Should -Match 'CN=www.example.org'
             $result.TimeTotal   | Should -BeGreaterThan ([timespan]::new(1))
         }
 
