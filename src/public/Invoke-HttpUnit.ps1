@@ -5,7 +5,7 @@ function Invoke-HttpUnit {
 .DESCRIPTION
     This is not a 100% accurate port of httpunit. The goal of this module is to utilize Net.Http.HttpClient to more closely simulate a .Net client application. It also provides easy access to the Windows Certificate store for client certificate authentication.
 .PARAMETER Path
-    Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1.
+    Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, json, and .psd1.
 .PARAMETER Tag
     If specified, only runs plans that are tagged with one of the tags specified.
 .PARAMETER Url

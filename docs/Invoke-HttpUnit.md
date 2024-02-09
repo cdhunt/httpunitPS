@@ -18,7 +18,7 @@ This is not a 100% accurate port of httpunit. The goal of this module is to util
 
 ### Parameter Set 2
 
-- `[String[]]` **Path** _Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, and .psd1._ Mandatory, ValueFromPipeline
+- `[String[]]` **Path** _Specifies a path to a configuration file with a list of tests. Supported types are .toml, .yml, json, and .psd1._ Mandatory, ValueFromPipeline
 - `[String[]]` **Tag** _If specified, only runs plans that are tagged with one of the tags specified._ 
 - `[Switch]` **Quiet** _Do not output ErrorRecords for failed tests._ 
 
