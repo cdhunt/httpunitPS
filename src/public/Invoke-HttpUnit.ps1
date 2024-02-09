@@ -180,7 +180,7 @@ function Invoke-HttpUnit {
                 'tags' { $testPlan.Tags = $plan[$_] }
                 'headers' { $testPlan.Headers = $plan[$_] }
                 'ips' { $testPlan.IPs = $plan[$_] }
-                'certficate' {
+                'certificate' {
                     $value = $plan[$_]
                     if ($value -like 'cert:\*') {
                         $testPlan.ClientCertificate = Get-Item $value
