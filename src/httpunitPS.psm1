@@ -63,6 +63,7 @@ class TestPlan {
         $planUrl = [uri]$this.URL
 
         foreach ($item in $this.ExpandIpList()) {
+            Write-Debug ('Adding test case for "{0}"' -f $item)
             $case = [TestCase]@{
                 URL        = $planUrl
                 IP         = $item
@@ -80,12 +81,8 @@ class TestPlan {
                 $case.ExpectHeaders = $this.Headers
             }
 
-
             $cases.Add($case)
         }
-
-
-
 
         return $cases
     }
@@ -109,6 +106,7 @@ class TestCase {
         switch ($this.URL.Scheme) {
             http { return $this.TestHttp() }
             https { return $this.TestHttp() }
+            tcp { return $this.TestTcp() }
             file {
                 $fileTest = [TestResult]::new()
                 $exception = [Exception]::new(("URL Scheme '{0}' is not supported. Did you mean to use the -Path parameter?" -f $this.URL.Scheme ))
@@ -124,11 +122,39 @@ class TestCase {
         return $noTest
     }
 
+    [TestResult] TestTcp() {
+        if ([string]::IsNullOrEmpty($this.Plan.Label)) {
+            $this.Plan.Label = $this.URL
+        }
+        $result = [TestResult]::new($this.Plan.Label)
+        $result.Connected = $true
+        $time = Get-Date
+
+        $testName = $this.IP
+        $testPort = $this.URL.Port
+
+        $result.Label = '{0} ({1})' -f $result.Label, $testName
+
+        $testOutput = Test-NetConnection -ComputerName $testName -Port $testPort
+
+        if (!$testOutput.TcpTestSucceeded) {
+            $result.Connected = $false
+            $exception = [Exception]::new(("TCP connect to ({0} : {1}) failed" -f $testName, $testPort ))
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "10", "ConnectionError", $this.URL)
+        }
+
+        $result.Response = $testOutput
+        $result.TimeTotal = (Get-Date) - $time
+        return $result
+    }
+
     [TestResult] TestHttp() {
         if ([string]::IsNullOrEmpty($this.Plan.Label)) {
             $this.Plan.Label = $this.URL
         }
         $result = [TestResult]::new($this.Plan.Label)
+
+        $result.Label = '{0} ({1})' -f $result.Label, $this.IP
         $time = Get-Date
 
         Write-Debug ('TestHttp: Url={0} ExpectCode={1}' -f $this.URL.AbsoluteUri, $this.ExpectCode)

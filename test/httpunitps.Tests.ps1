@@ -47,7 +47,22 @@ Describe 'Invoke-HttpUnit' {
             }
             $result.ServerCertificate.Subject | Should -Be 'CN=*.badssl.com, OU=PositiveSSL Wildcard, OU=Domain Control Validated'
         }
+
+        It 'Should test a TCP port' {
+            $result = Invoke-HttpUnit -Url tcp://example.com:443
+
+            $result.Result | Should -BeNullOrEmpty
+            $result.Connected   | Should -Be $true
+        }
+
+        It 'Should report a failed TCP test' {
+            $result = Invoke-HttpUnit -Url tcp://example.com:442 -Quiet
+
+            $result.Connected   | Should -Be $false
+            $result.Result.Exception.Message | Should -Be 'TCP connect to (example.com : 442) failed'
+        }
     }
+
     Context 'By Config' {
         It 'Should return 200 for google and find header {Server = "gws"} [<type>]' -ForEach @(
             @{ config = "$PSScriptRoot/testconfig1.psd1"; type = 'PSD1' }
