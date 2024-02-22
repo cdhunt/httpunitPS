@@ -60,24 +60,15 @@ Describe 'Invoke-HttpUnit' {
         It 'Should test a TCP port' {
             $result = Invoke-HttpUnit -Url tcp://example.com:443 -Quiet
 
-            if ($IsLinux) {
-                $result.Result.Exception.Message | Should -Be 'Not yet implemented on this platform'
-            } else {
             $result.Result | Should -BeNullOrEmpty
-            }
-
             $result.Connected   | Should -Be $true
         }
 
         It 'Should report a failed TCP test' {
             $result = Invoke-HttpUnit -Url tcp://example.com:442 -Quiet
 
-            if ($IsLinux) {
-                $result.Result.Exception.Message | Should -Be 'Not yet implemented on this platform'
-            } else {
             $result.Connected   | Should -Be $false
-                $result.Result.Exception.Message | Should -Match 'TCP connect to \(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3} : 442\) failed'
-            }
+            $result.Result.Exception.Message | Should -Match 'A connection attempt failed because the connected party did not properly respond'
         }
     }
 
