@@ -48,13 +48,22 @@ Describe 'Invoke-HttpUnit' {
             $result.ServerCertificate.Subject | Should -Be 'CN=*.badssl.com, OU=PositiveSSL Wildcard, OU=Domain Control Validated'
         }
 
+        It 'Should not error on a bad cert with SkipVerify' {
+            $result = Invoke-HttpUnit -Url https://expired.badssl.com/ -SkipVerify -Quiet
+
+            $result.Result      | Should -BeNullOrEmpty
+            $result.Connected   | Should -Be $true
+            $result.InvalidCert | Should -Be $false
+            $result.ServerCertificate.Subject | Should -Be 'CN=*.badssl.com, OU=PositiveSSL Wildcard, OU=Domain Control Validated'
+        }
+
         It 'Should test a TCP port' {
             $result = Invoke-HttpUnit -Url tcp://example.com:443 -Quiet
 
             if ($IsLinux) {
                 $result.Result.Exception.Message | Should -Be 'Not yet implemented on this platform'
             } else {
-                $result.Result | Should -BeNullOrEmpty
+            $result.Result | Should -BeNullOrEmpty
             }
 
             $result.Connected   | Should -Be $true
@@ -66,7 +75,7 @@ Describe 'Invoke-HttpUnit' {
             if ($IsLinux) {
                 $result.Result.Exception.Message | Should -Be 'Not yet implemented on this platform'
             } else {
-                $result.Connected   | Should -Be $false
+            $result.Connected   | Should -Be $false
                 $result.Result.Exception.Message | Should -Match 'TCP connect to \(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3} : 442\) failed'
             }
         }

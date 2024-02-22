@@ -24,6 +24,8 @@ function Invoke-HttpUnit {
     For http/https, the HTTP method to send.
 .PARAMETER IPAddress
     Provide one or more IPAddresses to target. Pass `'*'` to test all resolved addresses. Default is first resolved address.
+.PARAMETER SkipVerify
+    Allow testing of untrusted or self-signed certificates
 .PARAMETER Quiet
     Do not output ErrorRecords for failed tests.
 .EXAMPLE
@@ -130,6 +132,11 @@ function Invoke-HttpUnit {
         $IPAddress,
 
         [Parameter()]
+        [Alias('InsecureSkipVerify')]
+        [switch]
+        $SkipVerify,
+
+        [Parameter()]
         [Switch]
         $Quiet
     )
@@ -201,6 +208,8 @@ function Invoke-HttpUnit {
                 'Method' { $plan.Method = $Method }
                 'IPAddress' { $plan.IPs = $IPAddress }
             }
+
+            if ($SkipVerify) { $plan.insecureSkipVerify = $true }
 
             foreach ($case in $plan.Cases()) {
                 $result = $case.Test()
