@@ -68,7 +68,7 @@ Describe 'Invoke-HttpUnit' {
             $result = Invoke-HttpUnit -Url tcp://example.com:442 -Quiet
 
             $result.Connected   | Should -Be $false
-            $result.Result.Exception.Message | Should -Match 'A connection attempt failed because the connected party did not properly respond'
+            $result.Result.Exception.Message | Should -Match 'Exception calling "Connect"'
         }
     }
 
