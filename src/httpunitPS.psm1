@@ -135,21 +135,18 @@ class TestCase {
 
         $result.Label = '{0} ({1})' -f $result.Label, $testName
 
-        if ([System.Environment]::OSVersion.Platform.ToString() -eq 'Win32NT') {
-            $testOutput = Test-NetConnection -ComputerName $testName -Port $testPort
+        $socket = [Net.Sockets.Socket]::new([Net.Sockets.AddressFamily]::InterNetwork, [Net.Sockets.SocketType ]::Stream, [Net.Sockets.ProtocolType]::Tcp )
 
-
-            if (!$testOutput.TcpTestSucceeded) {
-                $result.Connected = $false
-                $exception = [Exception]::new(("TCP connect to ({0} : {1}) failed" -f $testName, $testPort ))
-                $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "10", "ConnectionError", $this.URL)
-            }
-
-            $result.Response = $testOutput
-        } else {
-            $exception = [Exception]::new(("Not yet implemented on this platform" ))
-            $result.Result = [System.Management.Automation.ErrorRecord]::new($exception, "100", "NotImplemented", $this.URL)
+        try {
+            $socket.Connect($testName, $testPort);
+            $socket.Shutdown([Net.Sockets.SocketShutdown]::Both)
+        } catch {
+            $result.Connected = $false
+            $result.Result = [System.Management.Automation.ErrorRecord]::new($_.Exception, "10", "ConnectionError", $this.URL)
+        } finally {
+            $socket.Close()
         }
+
         $result.TimeTotal = (Get-Date) - $time
         return $result
     }
