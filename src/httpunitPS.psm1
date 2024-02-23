@@ -21,11 +21,14 @@ class TestPlan {
         $planUrl = [uri]$this.URL
         $hostName = $planUrl.DnsSafeHost
 
-        $addressList = [Net.Dns]::GetHostEntry($hostName) |
-        Select-Object -ExpandProperty AddressList |
-        Where-Object AddressFamily -eq 'InterNetwork' |
-        Select-Object -ExpandProperty IPAddressToString
-
+        $addressList = $null
+        $isIp = [ipaddress]::TryParse($hostName, [ref]$addressList)
+        if (!$isip) {
+            $addressList = [Net.Dns]::GetHostEntry($hostName) |
+            Select-Object -ExpandProperty AddressList |
+            Where-Object AddressFamily -eq 'InterNetwork' |
+            Select-Object -ExpandProperty IPAddressToString
+        }
         if (!$All) {
             return $addressList | Select-Object -First 1
         }
@@ -135,10 +138,10 @@ class TestCase {
 
         $result.Label = '{0} ({1})' -f $result.Label, $testName
 
-        $socket = [Net.Sockets.Socket]::new([Net.Sockets.AddressFamily]::InterNetwork, [Net.Sockets.SocketType ]::Stream, [Net.Sockets.ProtocolType]::Tcp )
+        $socket = [Net.Sockets.Socket]::new([Net.Sockets.AddressFamily]::InterNetwork, [Net.Sockets.SocketType]::Stream, [Net.Sockets.ProtocolType]::Tcp )
 
         try {
-            $socket.Connect($testName, $testPort);
+            $socket.Connect($testName, $testPort)
             $socket.Shutdown([Net.Sockets.SocketShutdown]::Both)
         } catch {
             $result.Connected = $false
@@ -174,7 +177,10 @@ class TestCase {
         }
 
         $client = [Net.Http.HttpClient]::new($handler)
-        $client.DefaultRequestHeaders.Host = $this.URL.Host
+        if ($this.URL.Host -ne $this.IP) {
+            $client.DefaultRequestHeaders.Host = $this.URL.Host
+        }
+
         $client.Timeout = $this.Plan.Timeout
 
 

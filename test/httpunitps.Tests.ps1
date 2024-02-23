@@ -70,6 +70,13 @@ Describe 'Invoke-HttpUnit' {
             $result.Connected   | Should -Be $false
             $result.Result.Exception.Message | Should -Match 'Exception calling "Connect"'
         }
+
+        It 'Should test a raw IP' {
+            $result = Invoke-HttpUnit -Url https://93.184.216.34 -Code 404 -Quiet -SkipVerify
+
+            $result.Connected   | Should -Be $true
+            $result.Gotcode   | Should -Be $true
+        }
     }
 
     Context 'By Config' {
