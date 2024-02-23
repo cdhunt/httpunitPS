@@ -72,10 +72,10 @@ Describe 'Invoke-HttpUnit' {
         }
 
         It 'Should test a raw IP' {
-            $result = Invoke-HttpUnit -Url https://93.184.216.34 -Quiet -SkipVerify
+            $result = Invoke-HttpUnit -Url https://93.184.216.34 -Code 404 -Quiet -SkipVerify
 
-            $result.Result | Should -BeNullOrEmpty
             $result.Connected   | Should -Be $true
+            $result.Gotcode   | Should -Be $true
         }
     }
 

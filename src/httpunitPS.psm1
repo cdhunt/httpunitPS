@@ -177,7 +177,10 @@ class TestCase {
         }
 
         $client = [Net.Http.HttpClient]::new($handler)
-        $client.DefaultRequestHeaders.Host = $this.URL.Host
+        if ($this.URL.Host -ne $this.IP) {
+            $client.DefaultRequestHeaders.Host = $this.URL.Host
+        }
+
         $client.Timeout = $this.Plan.Timeout
 
 
