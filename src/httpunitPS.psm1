@@ -24,10 +24,15 @@ class TestPlan {
         $addressList = $null
         $isIp = [ipaddress]::TryParse($hostName, [ref]$addressList)
         if (!$isip) {
-            $addressList = [Net.Dns]::GetHostEntry($hostName) |
-            Select-Object -ExpandProperty AddressList |
-            Where-Object AddressFamily -eq 'InterNetwork' |
-            Select-Object -ExpandProperty IPAddressToString
+            try {
+                $addressList = [Net.Dns]::GetHostEntry($hostName) |
+                Select-Object -ExpandProperty AddressList |
+                Where-Object AddressFamily -eq 'InterNetwork' |
+                Select-Object -ExpandProperty IPAddressToString
+            } catch {
+                Write-Verbose "Cannot resolve hostname '$hostName'."
+            }
+
         }
         if (!$All) {
             return $addressList | Select-Object -First 1
@@ -66,12 +71,17 @@ class TestPlan {
         $planUrl = [uri]$this.URL
 
         foreach ($item in $this.ExpandIpList()) {
+
             Write-Debug ('Adding test case for "{0}"' -f $item)
             $case = [TestCase]@{
                 URL        = $planUrl
-                IP         = $item
                 Plan       = $this
                 ExpectCode = [System.Net.HttpStatusCode]$this.Code
+            }
+            if (![string]::IsNullOrEmpty($item)) {
+                $case.IP = $item
+            } else {
+                Write-Debug ('No IP for "{0}".' -f $planUrl)
             }
 
             if (![string]::IsNullOrEmpty($this.Text)) {
@@ -183,8 +193,12 @@ class TestCase {
 
         $client.Timeout = $this.Plan.Timeout
 
+        if ($null -ne $this.IP) {
+            $testUri = $this.URL.OriginalString -replace $this.URL.Host, $this.IP.ToString()
+        } else {
+            $testUri = $this.URL
+        }
 
-        $testUri = $this.URL.OriginalString -replace $this.URL.Host, $this.IP.ToString()
         $content = [Net.Http.HttpRequestMessage]::new($this.Plan.Method, [Uri]$testUri)
 
         if ($this.Plan.InsecureSkipVerify) {
@@ -266,7 +280,10 @@ class TestCase {
             $result.TimeTotal = (Get-Date) - $time
 
             if ($this.URL.Scheme -eq 'https') {
-                $result.ServerCertificate = Get-SSLCertificate -ComputerName $this.URL.DnsSafeHost -Port $this.URL.Port
+                $getSSL = Get-SSLCertificate -ComputerName $this.URL.DnsSafeHost -Port $this.URL.Port -ErrorAction SilentlyContinue
+                if ($getSSL -is [System.Security.Cryptography.X509Certificates.X509Certificate2]) {
+                    $result.ServerCertificate = $getSSL
+                }
             }
         }
 
