@@ -71,6 +71,13 @@ Describe 'Invoke-HttpUnit' {
             $result.Result.Exception.Message | Should -Match 'Exception calling "Connect"'
         }
 
+        It 'Should report "No such host is known"' {
+            $result = Invoke-HttpUnit -Url "https://asfldjfalsjfalsdkjf.com" -Quiet
+
+            $result.Connected   | Should -Be $false
+            $result.Result.Exception.Message | Should -Match 'No such host is known.'
+        }
+
         It 'Should test a raw IP' {
             $result = Invoke-HttpUnit -Url https://93.184.216.34 -Code 404 -Quiet -SkipVerify
 
